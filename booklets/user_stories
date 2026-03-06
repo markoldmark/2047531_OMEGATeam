@@ -8,10 +8,10 @@ Da Responsabile di sicurezza, se l'umidità in ingresso scende sotto il 40% veng
 Da Botanico, vorrei che se il livello dell'acqua scende sotto il 10% disattiva l'entrace humidifier.
 
 # 5
-Da Botanico, vorrei che se il PH idroponico sale sopra 9 disattiva l'entrance humidifier.
+Da Botanico, vorrei che se il PH idroponico sale sopra 9, lancia un warning critico per blocco nutrienti.
 
 # 6
-Da Responsabile della sicurezza, se la temperatura dell'habitat scende sotto i 5 gradi attiva l'habitat heater.
+Da Responsabile della sicurezza, se la temperatura della greenhouse scende sotto i 5 gradi attiva l'habitat heater.
 
 # 7
 Da Responsabile della sicurezza, se il thermal loop supera i 45 gradi attiviamo la cooling fan.
@@ -38,7 +38,7 @@ Da Ingegnere Energetico, voglio comparare la potenza prodotta dai pannelli con q
 Da Ingegnere Energetico, se la power consumption supera i 50 KW disattiva habitat heater.
 
 # 15
-Da Ingegnere Energetico, se il voltaggio del power bus supera i 215V attiva cooling fan.
+Da Ingegnere Energetico, se il voltaggio del power bus supera i 215A attiva cooling fan.
 
 # 16
 Da Ufficiale di Guardia, voglio che se la temperatura della serra aumenta di più di 5 gradi in meno di un minuto venga attivata la cooling fan.
