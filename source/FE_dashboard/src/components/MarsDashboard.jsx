@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import OdometerGauge from './OdometerGauge';
 import VerticalBarGauge from './VerticalBarGauge';
 import HorizontalBarGauge from './HorizontalBarGauge';
+import WarningLight from './WarningLight';
 
 const MarsDashboard = () => {
   const [isAuto, setIsAuto] = useState(true);
@@ -44,12 +45,12 @@ const MarsDashboard = () => {
           
           {/* 1. GREENHOUSE (Titolo in alto) */}
           {/* 1. GREENHOUSE */}
-          <div className="bg-green-200 rounded-[30px] border-[3px] border-gray-500 p-6 flex flex-col shadow-inner relative">
+          <div className="bg-green-200 rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner relative">
             <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-4">greenhouse</div>
             
             <div className="flex justify-between items-stretch flex-grow gap-6">
               
-              <div className="flex gap-6 h-full pb-2">
+              <div className="flex gap-6 h-full">
                 <VerticalBarGauge 
                   value={28} 
                   min={-20} 
@@ -70,13 +71,18 @@ const MarsDashboard = () => {
                 />
               </div>
 
-              <div className="flex flex-col justify-start items-end gap-4 w-full">
-                <div className="w-full">
+              <div className="flex flex-col justify-start items-end align-center w-full">
+                <div className="flex items-baseline justify-between gap-2 w-full">
+                  <span className="text-xs font-bold text-gray-800 uppercase tracking-widest mt-auto ml-2">PH</span>
+                  <WarningLight isOn={true} text="!" activeColor="bg-yellow-400"/>
+                </div>
+                <div className="flex flex-row justify-end content-center gap-4 w-full">
                   <HorizontalBarGauge 
                     value={6.5} // Valore di esempio
                     min={0} 
-                    max={14} 
-                    label="ph"
+                    max={14}
+                    tickCount={7}
+                    label=""
                     fillColor="bg-green-500" 
                     emptyColor="bg-green-200" // Ho tenuto lo sfondo verde chiaro del tuo design originale
                   />
@@ -87,7 +93,7 @@ const MarsDashboard = () => {
           </div>
 
           {/* 2. HABITAT (Titolo in alto) */}
-          <div className="bg-yellow-200 rounded-[30px] border-[3px] border-gray-500 p-6 flex flex-col shadow-inner">
+          <div className="bg-yellow-200 rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner">
              {/* Titolo ancorato in alto */}
             <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-4">habitat</div>
             
