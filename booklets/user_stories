@@ -1,17 +1,14 @@
 # 1 
-Da Botanico, vorrei che se la temperatura della serra si alza sopra gli 35 gradi venga attivata la cooling fan.
+Da Botanico, vorrei che se la temperatura della serra si alza sopra i 35 gradi venga attivata la cooling fan.
 
 # 2
-Da Botanico, vorei che se l'umidità della serra scende sotto il 50% venga attivato l'entrace humidifier.
-
-# 3
-Da Botanico, vorrei che se il livello dell'acqua sale sopra il 90% attiva l'habitat heater.
+Da Responsabile di sicurezza, se l'umidità in ingresso scende sotto il 40% venga attivato l'entrace humidifier.
 
 # 4
 Da Botanico, vorrei che se il livello dell'acqua scende sotto il 10% disattiva l'entrace humidifier.
 
 # 5
-Da Botanico, vorrei che se il PH idroponico sale sopra 13, lanciare lo stato warning.
+Da Botanico, vorrei che se il PH idroponico sale sopra 9 disattiva l'entrance humidifier.
 
 # 6
 Da Responsabile della sicurezza, se la temperatura dell'habitat scende sotto i 5 gradi attiva l'habitat heater.
@@ -41,6 +38,6 @@ Da Ingegnere Energetico, voglio comparare la potenza prodotta dai pannelli con q
 Da Ingegnere Energetico, se la power consumption supera i 50 KW disattiva habitat heater.
 
 # 15
-Da Ingegnere Energetico, se la temperatura del power bus supera i 60 gradi attiva cooling fan.
+Da Ingegnere Energetico, se la temperatura del power bus supera i 215V attiva cooling fan.
 
 
