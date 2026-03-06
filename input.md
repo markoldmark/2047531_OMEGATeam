@@ -76,11 +76,13 @@ To process heterogeneous data (REST arrays, scalar objects, Telemetry streams) u
     }
   }
 }
+```
 
 ## 4. Rule Model
 
 The Rule Model defines the configuration schema for the automation logic. The engine evaluates the condition against the Standard Event Schema. If it resolves to true, the action is executed.
 
+```json
 {
   "type": "object",
   "required": ["rule_id", "description", "is_active", "condition", "action"],
@@ -130,3 +132,4 @@ The Rule Model defines the configuration schema for the automation logic. The en
     }
   }
 }
+```
