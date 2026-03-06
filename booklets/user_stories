@@ -2,13 +2,16 @@
 Da Botanico, vorrei che se la temperatura della serra si alza sopra i 35 gradi venga attivata la cooling fan.
 
 # 2
-Da Responsabile di sicurezza, se l'umidità in ingresso scende sotto il 40% venga attivato l'entrace humidifier.
+Da Botanico, voglio che se la temperatura della serra aumenta di più di 5 gradi in meno di un minuto venga attivata la cooling fan.
+
+# 3
+Da Botanico, vorrei che se il livello dell'acqua scende sotto il 10% disattiva l'entrance humidifier.
 
 # 4
-Da Botanico, vorrei che se il livello dell'acqua scende sotto il 10% disattiva l'entrace humidifier.
+Da Botanico, vorrei che se il PH idroponico sale sopra 9, lancia un warning critico per blocco nutrienti.
 
 # 5
-Da Botanico, vorrei che se il PH idroponico sale sopra 9, lancia un warning critico per blocco nutrienti.
+Da Responsabile di sicurezza, se l'umidità in ingresso scende sotto il 40% venga attivato l'entrance humidifier.
 
 # 6
 Da Responsabile della sicurezza, se la temperatura della greenhouse scende sotto i 5 gradi attiva l'habitat heater.
@@ -17,40 +20,40 @@ Da Responsabile della sicurezza, se la temperatura della greenhouse scende sotto
 Da Responsabile della sicurezza, se il thermal loop supera i 45 gradi attiviamo la cooling fan.
 
 # 8
-Da Responsabile della sicurezza, se la CO2 nella hall supera gli 950ppm attiva hall ventilation.
+Da Responsabile della sicurezza, se la CO2 nella hall supera gli 950ppm attiva hall ventilation automaticamente.
 
 # 9
-Da Responsabile della sicurezza, se il PM 25 dell'aria supera 35 attiva hall ventilation.
+Da Responsabile della sicurezza, se il PM 25 dell'aria supera 35 attiva hall ventilation automaticamente.
 
 # 10
-Da Responsabile della sicurezza, voglio monitorare la pressione del corridoio per fornire eventualmente tute di emergenza.
+Da Responsabile della sicurezza, se i cicli dell'airlock superano i 10 nella stessa ora, viene lanciato un warning.
 
 # 11
-Da Responsabile della sicurezza, voglio visualizzare lo stato dell'airlock per coordinare le attività in sicurezza.
+Da Responsabile della sicurezza, se l'airlock è in stato DEPRESSURIZING disattiva automaticamente hall ventilation
 
-# 12
-Da Responsabile della sicurezza, voglio monitorare i livelli di radiazione per permettere il rientro del personale che si trova all'esterno.
-
-# 13
+# 11
 Da Ingegnere Energetico, voglio comparare la potenza prodotta dai pannelli con quella consumata per verificare che non sia mai inferiore.
 
-# 14
+# 12
 Da Ingegnere Energetico, se la power consumption supera i 50 KW disattiva habitat heater.
 
-# 15
-Da Ingegnere Energetico, se il voltaggio del power bus supera i 215A attiva cooling fan.
+# 13
+Da Ingegnere Energetico, se la corrente del power bus supera i 220A attiva cooling fan.
 
-# 16
-Da Ufficiale di Guardia, voglio che se la temperatura della serra aumenta di più di 5 gradi in meno di un minuto venga attivata la cooling fan.
-
-# 17
+# 14
 Da Ufficiale di Guardia, voglio visualizzare un riepilogo dello stato generale dell'habitat con un indicatore visivo di allarme per ogni zona critica.
 
+# 15
+Da Ufficiale di Guardia, voglio visualizzare lo storico degli ultimi tre warning scattati durante il mio turno per ricostruire eventuali sequenze di emergenza.
+
+# 16
+Da Ufficiale di Guardia, voglio monitorare la pressione del corridoio per fornire eventualmente tute di emergenza.
+
+# 17
+Da Ufficiale di Guardia, voglio visualizzare lo stato dell'airlock per coordinare le attività in sicurezza.
+
 # 18
-Da Ufficiale di Guardia, voglio visualizzare lo storico delle ultime regole scattate durante il mio turno per ricostruire eventuali sequenze di emergenza.
+Da Ufficiale di Guardia, voglio monitorare i livelli di radiazione per permettere il rientro del personale che si trova all'esterno.
 
 # 19
-Da Ufficiale di Guardia, voglio che se contemporaneamente la CO2 supera i 950 ppm e la hall ventilation è spenta venga attivata automaticamente.
-
-# 20
-Da Ufficiale di Guardia, voglio poter disattivare manualmente una regola di automazione in caso di falso allarme senza doverla eliminare.
+Da Ufficiale di Guardia, voglio poter disattivare manualmente le regole di automazione per prendere il controllo.
