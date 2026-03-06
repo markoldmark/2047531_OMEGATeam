@@ -41,7 +41,7 @@ Da Ingegnere Energetico, se la corrente del power bus supera i 220A attiva cooli
 Da Ingegnere Energetico, se il voltaggio del power bus supera i 250V attiva cooling fan.
 
 # 15
-Da Ufficiale di Guardia, voglio visualizzare un riepilogo dello stato generale dell'habitat con un indicatore visivo di allarme per ogni zona critica.
+Da Ufficiale di Guardia, voglio visualizzare graficamente la temperatura dell'habitat per tenere sotto controllo le tendenze.
 
 # 16
 Da Ufficiale di Guardia, voglio visualizzare lo storico delle spie accese durante la sessione per ricostruire eventuali sequenze di emergenza.
