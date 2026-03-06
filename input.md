@@ -13,7 +13,7 @@ The core of the system is a Rule Engine that evaluates incoming normalized event
 * **US1:** As a Botanist, if the `greenhouse_temperature` rises above 35 degrees, activate the `cooling_fan`.
 * **US2:** As a Botanist, if the `greenhouse_temperature` falls below 5 degrees, activate the `habitat_heater`.
 * **US3:** As a Botanist, if the `water_tank_level` falls below 10%., deactivate the `entrance_humidifier`.
-* **US4:** As a Botanist, if the `hydroponic_ph` rises above 9, enable a critical UI warning light to turn on to block nutrients.
+* **US4:** As a Botanist, if the `hydroponic_ph` rises above 9, a warning UI light is turned on to block nutrients.
 
 ### Safety Manager
 * **US5:** As a Safety Manager, if the `entrance_humidity` drops below 40%, activate the `entrance_humidifier`.
@@ -31,11 +31,11 @@ The core of the system is a Rule Engine that evaluates incoming normalized event
 
 ### Administrator
 * **US15:** As an Administrator, I want to graphically view the habitat temperature to keep track of the trends.
-* **US16:** As an Administrator, I want to view the history of the lights that were on during the session to reconstruct any emergency sequences.
+* **US16:** As an Administrator, I want to view the history of the warning lights that were on during the session to reconstruct any emergency sequences.
 * **US17:** As an Administrator, I want to monitor the `corridor_pressure` to possibly provide emergency suits.
 * **US18:** As an Administrator, I want to view the status of the `airlock` to coordinate activities safely.
 * **US19:** As an Administrator, I want to monitor `radiation` levels to allow the return of personnel who are outside.
-* **US20:** As an Administrator, I want to be able to manually deactivate automation rules to take control.
+* **US20:** As an Administrator, I want to be able to deactivate automation rules to take manual control.
 
 ## 3. Standard Event Schema
 To process heterogeneous data (REST arrays, scalar objects, Telemetry streams) uniformly, all incoming data is mapped to a `Standard Event Schema` before entering the Rule Engine.
@@ -78,6 +78,8 @@ To process heterogeneous data (REST arrays, scalar objects, Telemetry streams) u
 }
 
 ## 4. Rule Model
+
+The Rule Model defines the configuration schema for the automation logic. The engine evaluates the condition against the Standard Event Schema. If it resolves to true, the action is executed.
 
 {
   "type": "object",
