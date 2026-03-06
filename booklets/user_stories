@@ -40,4 +40,17 @@ Da Ingegnere Energetico, se la power consumption supera i 50 KW disattiva habita
 # 15
 Da Ingegnere Energetico, se il voltaggio del power bus supera i 215V attiva cooling fan.
 
+# 16
+Da Ufficiale di Guardia, voglio che se la temperatura della serra aumenta di più di 5 gradi in meno di un minuto venga attivata la cooling fan.
 
+# 17
+Da Ufficiale di Guardia, voglio visualizzare un riepilogo dello stato generale dell'habitat con un indicatore visivo di allarme per ogni zona critica.
+
+# 18
+Da Ufficiale di Guardia, voglio visualizzare lo storico delle ultime regole scattate durante il mio turno per ricostruire eventuali sequenze di emergenza.
+
+# 19
+Da Ufficiale di Guardia, voglio che se contemporaneamente la CO2 supera i 950 ppm e la hall ventilation è spenta venga attivata automaticamente.
+
+# 20
+Da Ufficiale di Guardia, voglio poter disattivare manualmente una regola di automazione in caso di falso allarme senza doverla eliminare.
