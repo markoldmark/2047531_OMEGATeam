@@ -1,0 +1,3 @@
+# Ignora i dump delle immagini Docker
+*.tar
+simulator/*.tar

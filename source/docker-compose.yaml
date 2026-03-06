@@ -1,1 +1,35 @@
-to do
+services:
+  # --- SIMULATORE MARZIANO (Fornito) ---
+  simulator:
+    image: mars-iot-simulator:multiarch_v1
+    container_name: mars_simulator
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # --- SERVIZIO DATABASE ---
+  db:
+    image: postgres:15-alpine
+    container_name: mars_iot_db
+    environment:
+      POSTGRES_USER: mars_user
+      POSTGRES_PASSWORD: mars_password
+      POSTGRES_DB: mars_iot_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  # --- SERVIZIO FRONTEND ---
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mars_iot_frontend
+    ports:
+      - "3000:80" # <-- Spostato su localhost:3000 per lasciare la 8080 al simulatore
+    depends_on:
+      - db
+      - simulator
+    restart: unless-stopped
