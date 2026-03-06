@@ -1,0 +1,45 @@
+# 1 
+Da Botanico, vorrei che se la temperatura della serra si alza sopra gli 35 gradi venga attivata la cooling fan.
+
+# 2
+Da Botanico, vorei che se l'umidità della serra scende sotto il 50% venga attivato l'entrace humidifier.
+
+# 3
+Da Botanico, vorrei che se il livello dell'acqua sale sopra il 90% attiva l'habitat heater.
+
+# 4
+Da Botanico, vorrei che se il livello dell'acqua scende sotto il 10% disattiva l'entrace humidifier.
+
+# 5
+Da Botanico, vorrei che se il PH idroponico sale sopra 13, lanciare lo stato warning.
+
+# 6
+Da Responsabile della sicurezza, se la temperatura dell'habitat scende sotto i 5 gradi attiva l'habitat heater.
+
+# 7
+Da Responsabile della sicurezza, se il thermal loop supera i 45 gradi attiviamo la cooling fan.
+
+# 8
+Da Responsabile della sicurezza, se la CO2 nella hall supera gli 950ppm attiva hall ventilation.
+
+# 9
+Da Responsabile della sicurezza, se il PM 25 dell'aria supera 35 attiva hall ventilation.
+
+# 10
+Da Responsabile della sicurezza, voglio visualizzare lo stato dell'airlock per coordinare le attività in sicurezza.
+
+# 11
+Da Responsabile della sicurezza, voglio monitorare i livelli di radiazione per permettere il rientro del personale che si trova all'esterno.
+
+# 12
+Da Ingegnere Energetico, voglio comparare la potenza prodotta dai pannelli con quella consumata per verificare che non sia mai inferiore.
+
+# 13
+Da Ingegnere Energetico, se la power consumption supera i 50 KW disattiva habitat heater.
+
+# 14
+Da Ingegnere Energetico, se la temperatura del power bus supera i 60 gradi attiva cooling fan.
+
+# 15
+
+
