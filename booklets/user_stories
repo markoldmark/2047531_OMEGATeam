@@ -31,29 +31,31 @@ Da Responsabile della sicurezza, se i cicli dell'airlock superano i 10 nella ste
 # 11
 Da Responsabile della sicurezza, se l'airlock è in stato DEPRESSURIZING disattiva automaticamente hall ventilation
 
-# 11
+# 12
 Da Ingegnere Energetico, voglio comparare la potenza prodotta dai pannelli con quella consumata per verificare che non sia mai inferiore.
 
-# 12
+# 13
 Da Ingegnere Energetico, se la power consumption supera i 50 KW disattiva habitat heater.
 
-# 13
+# 14
 Da Ingegnere Energetico, se la corrente del power bus supera i 220A attiva cooling fan.
 
-# 14
+# 15
 Da Ufficiale di Guardia, voglio visualizzare un riepilogo dello stato generale dell'habitat con un indicatore visivo di allarme per ogni zona critica.
 
-# 15
+# 16
 Da Ufficiale di Guardia, voglio visualizzare lo storico degli ultimi tre warning scattati durante il mio turno per ricostruire eventuali sequenze di emergenza.
 
-# 16
+# 17
 Da Ufficiale di Guardia, voglio monitorare la pressione del corridoio per fornire eventualmente tute di emergenza.
 
-# 17
+# 18
 Da Ufficiale di Guardia, voglio visualizzare lo stato dell'airlock per coordinare le attività in sicurezza.
 
-# 18
+# 19
 Da Ufficiale di Guardia, voglio monitorare i livelli di radiazione per permettere il rientro del personale che si trova all'esterno.
 
-# 19
+# 20
 Da Ufficiale di Guardia, voglio poter disattivare manualmente le regole di automazione per prendere il controllo.
+
+THE END
