@@ -21,14 +21,35 @@ services:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
 
-  # --- SERVIZIO FRONTEND ---
+  # # --- SERVIZIO FRONTEND ---
+  # frontend:
+  #   build: 
+  #     context: ./FE_dashboard
+  #     dockerfile: Dockerfile
+  #   container_name: FE_dashboard
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - db
+  #     - simulator
+  #   restart: unless-stopped
+
+  # --- SERVIZIO FRONTEND (Modalità Sviluppo) ---
   frontend:
     build: 
       context: ./FE_dashboard
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev # <--- Puntiamo al nuovo file
     container_name: FE_dashboard
     ports:
-      - "3000:80"
+      - "5173:5173" # <--- Cambia in 3000:3000 se usi Create React App
+    volumes:
+      # Questo volume "sincronizza" la tua cartella locale con quella del container
+      - ./FE_dashboard:/app
+      # Questo trucco evita che la tua cartella node_modules locale sovrascriva quella del container
+      - /app/node_modules
+    environment:
+      # Forza l'aggiornamento dei file, super utile se sviluppi da Windows/WSL
+      - CHOKIDAR_USEPOLLING=true 
     depends_on:
       - db
       - simulator
