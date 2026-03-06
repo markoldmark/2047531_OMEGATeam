@@ -38,6 +38,6 @@ Da Ingegnere Energetico, voglio comparare la potenza prodotta dai pannelli con q
 Da Ingegnere Energetico, se la power consumption supera i 50 KW disattiva habitat heater.
 
 # 15
-Da Ingegnere Energetico, se la temperatura del power bus supera i 215V attiva cooling fan.
+Da Ingegnere Energetico, se il voltaggio del power bus supera i 215V attiva cooling fan.
 
 
