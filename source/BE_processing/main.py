@@ -59,8 +59,6 @@ async def process_message(message: aio_pika.IncomingMessage):
         payload = json.loads(message.body.decode())
         source = payload.get("source_name")
         measurements = payload.get("measurements", {})
-
-        print(f"[DEBUG] Ricevuto evento da: {source}")
         
         # Carica le regole correnti 
         rules = fetch_rules()
