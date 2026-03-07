@@ -29,7 +29,7 @@ const VerticalBarGauge = ({
       <div className="flex flex-col items-center relative h-full">
         
         {/* Corpo della Barra */}
-        <div className="w-8 h-full bg-gray-600 rounded-[30px] relative overflow-hidden border-[2px] border-gray-500 shadow-inner">
+        <div className="w-10 h-full bg-gray-600 rounded-[30px] relative overflow-hidden border-[2px] border-gray-500 shadow-inner">
           <div 
             className={`absolute bottom-0 w-full ${fillColor} transition-all duration-500 ease-in-out`}
             style={{ height: `${percentage}%` }}

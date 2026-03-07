@@ -91,11 +91,11 @@ const MarsDashboard = () => {
         
         <div className="relative grid grid-cols-2 grid-rows-2 gap-6 h-[600px]">
           
-          {/* 1. GREENHOUSE */}
+          {/* 1. GREENHOUSE (Il modello di riferimento) */}
           <div className="bg-green-200 rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner relative">
             <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-4">greenhouse</div>
             
-            <div className="flex justify-between items-stretch flex-grow gap-6">
+            <div className="flex justify-between items-stretch flex-grow gap-6 h-full">
               <div className="flex gap-6 h-full">
                 <VerticalBarGauge value={sensorData.greenhouse_temp} min={10} max={35} label="temp" unit="°C" fillColor="bg-red-500" tickCount={8} />
                 <VerticalBarGauge value={sensorData.water_level} min={0} max={100} label="wlev" unit="%" fillColor="bg-blue-500" tickCount={5} />
@@ -114,16 +114,16 @@ const MarsDashboard = () => {
           </div>
           
          {/* 2. HABITAT */}
-          <div className="bg-[#fef3c7] rounded-[40px] border-[3px] border-[#333] p-6 flex flex-col shadow-2xl relative min-w-[500px]">
-            <div className="text-left text-[#4b5563] font-bold text-2xl tracking-widest uppercase mb-2 ml-4">habitat</div>
+          <div className="bg-[#fef3c7] rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner relative">
+            <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-4">habitat</div>
             
-            <div className="flex flex-row justify-between items-start gap-4">
-              <div className="flex flex-col items-center mt-4">
+            <div className="flex justify-between items-stretch flex-grow gap-6">
+              <div className="flex flex-col items-center justify-start">
                 <OdometerGauge value={sensorData.co2} min={500} max={1500} label="co2" needleColor="bg-red-600" />
               </div>
 
-              <div className="flex flex-col gap-4 scale-75 mt-[-40px] items-center">
-                <div className="flex flex-col items-center">
+              <div className="flex flex-col gap-4 scale-50 items-center justify-start">
+                <div className="flex flex-col items-center justify-start">
                   <TempGraph data={sensorData.tempHistory || [45, 30, 40, 25, 50, 35, 45]} label="temp" />
                 </div>
                 <div className="flex flex-col items-center">
@@ -132,7 +132,7 @@ const MarsDashboard = () => {
                 </div>
               </div>
 
-              <div className="flex gap-6 h-[70%] mt-2">
+              <div className="flex gap-6 h-full">
                 <VerticalBarGauge value={sensorData.pm25} min={0} max={100} label="pm25" unit="" fillColor="bg-red-600" tickCount={5} />
                 <VerticalBarGauge value={sensorData.humidity} min={0} max={100} label="hum" unit="%" fillColor="bg-white" tickCount={5} />
               </div>
@@ -140,9 +140,11 @@ const MarsDashboard = () => {
           </div>
 
           {/* 3. AIRLOCK */}
-          <div className="bg-cyan-200 rounded-[30px] border-[3px] border-gray-500 p-6 flex flex-col shadow-inner">
-             <div className="flex justify-between w-[40%]">
-                <div className="text-center w-full">
+          <div className="bg-cyan-200 rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner relative">
+            <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-4">airlock</div>
+             
+             <div className="flex justify-between items-stretch flex-grow gap-6 h-full">
+               <div className="flex flex-col items-center justify-center w-[40%]">
                   <OdometerGauge value={sensorData.radiation} min={0} max={10} label="radiation" needleColor="bg-blue-600" />
                 </div>
              </div>
@@ -167,38 +169,27 @@ const MarsDashboard = () => {
           </div>
 
           {/* 4. POWER */}
-          <div className="bg-[#fed7aa] rounded-[30px] border-[3px] border-gray-500 p-6 flex flex-col shadow-inner">
-            <div className="flex flex-row justify-between items-center flex-grow px-2 scale-90 origin-center">
-              
-              <div className="flex flex-col items-center relative pt-8">
-                <div className="scale-75"> 
+          <div className="bg-[#fed7aa] rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner relative">
+            <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-4">power</div>
+            
+            <div className="flex justify-between items-stretch flex-grow gap-6 h-full">
+              <div className="flex flex-col items-center justify-center">
+                <div className="scale-90"> 
                   <OdometerGauge value={sensorData.tloop} min={10} max={55} label="tloop" needleColor="bg-orange-500" />
                 </div>
               </div>
 
-              <div className="flex flex-row items-end gap-6 h-48 mb-4"> 
-                <div className="flex gap-3 h-full">
-                  <div className="flex flex-col items-center h-full justify-end">
-                    <VerticalBarGauge value={sensorData.voltage} min={0} max={800} label="v" fillColor="bg-gray-100" />
-                  </div>
-                  <div className="flex flex-col items-center h-full justify-end">
-                    <VerticalBarGauge value={sensorData.ampere} min={0} max={400} label="a" fillColor="bg-gray-100" />
-                  </div>
+              <div className="flex gap-4 h-full"> 
+                <div className="flex gap-4 h-full">
+                  <VerticalBarGauge value={sensorData.voltage} min={0} max={800} label="v" fillColor="bg-gray-100" tickCount={5} />
+                  <VerticalBarGauge value={sensorData.ampere} min={0} max={400} label="a" fillColor="bg-gray-100" tickCount={5} />
                 </div>
 
-                <div className="flex gap-3 h-full border-l border-black/10 pl-4"> 
-                  <div className="flex flex-col items-center h-full justify-end">
-                    <VerticalBarGauge value={sensorData.production} min={0} max={300} label="pro" fillColor="bg-green-600" />
-                  </div>
-                  <div className="flex flex-col items-center h-full justify-end">
-                    <VerticalBarGauge value={sensorData.consumption} min={0} max={300} label="cons" fillColor="bg-red-600" />
-                  </div>
+                <div className="flex gap-4 h-full border-l-[3px] border-orange-300 pl-4"> 
+                  <VerticalBarGauge value={sensorData.production} min={0} max={300} label="pro" fillColor="bg-green-600" tickCount={5} />
+                  <VerticalBarGauge value={sensorData.consumption} min={0} max={300} label="cons" fillColor="bg-red-600" tickCount={5} />
                 </div>
               </div>
-            </div>
-
-            <div className="text-black font-bold text-xl tracking-widest uppercase opacity-80 mt-auto text-center">
-              power
             </div>
           </div>
 
@@ -220,7 +211,7 @@ const MarsDashboard = () => {
             </div>
           </div>
         </div>
-        
+
         {/* BOTTOM BAR */}
         <div className="flex justify-between items-center gap-4 h-20">
           <div className="bg-[#4b5563] h-full rounded-2xl px-8 flex items-center justify-center shadow-inner">
@@ -248,6 +239,7 @@ const MarsDashboard = () => {
           </div>
         )}
 
+        {/* RULES & HISTORY (Puliti dai riferimenti UI_ALERT) */}
         <div className="grid grid-cols-2 gap-6">
           <div className="bg-white rounded-[30px] p-5 border-4 border-gray-400 shadow-inner min-h-[220px]">
             <div className="text-black font-bold text-xl tracking-widest uppercase mb-4">rules</div>
@@ -256,25 +248,13 @@ const MarsDashboard = () => {
                 <div className="text-sm text-gray-500">No rules available</div>
               )}
               {rules.map((rule) => (
-                <div
-                  key={rule.rule_id}
-                  className={`rounded-2xl p-3 border ${
-                    rule.action_type === 'UI_ALERT'
-                      ? 'bg-yellow-100 border-yellow-400'
-                      : 'bg-gray-100 border-gray-300'
-                  }`}
-                >
+                <div key={rule.rule_id} className="rounded-2xl p-3 border bg-gray-100 border-gray-300">
                   <div className="flex items-center justify-between gap-2">
                     <div className="text-sm font-bold text-gray-800">{rule.rule_id}</div>
-                    {rule.action_type === 'UI_ALERT' && (
-                      <div className="text-[10px] font-black tracking-widest text-yellow-900 bg-yellow-300 px-2 py-1 rounded-full">
-                        ALERT
-                      </div>
-                    )}
                   </div>
                   <div className="text-sm text-gray-700">{rule.description}</div>
                   <div className="text-xs text-gray-500 mt-1">
-                    {rule.source_name} {rule.operator} {rule.threshold} {"->"} {rule.target} {rule.payload}
+                    IF {rule.source_name} {rule.operator} {rule.threshold} {"->"} SET {rule.actuator_name} to {rule.actuator_state}
                   </div>
                   <div className="text-xs mt-2 font-semibold">
                     {rule.is_active ? 'ACTIVE' : 'INACTIVE'}
@@ -291,27 +271,15 @@ const MarsDashboard = () => {
                 <div className="text-sm text-gray-500">No trigger history yet</div>
               )}
               {history.map((item) => (
-                <div
-                  key={item.id}
-                  className={`rounded-2xl p-3 border ${
-                    item.action_type === 'UI_ALERT'
-                      ? 'bg-yellow-100 border-yellow-400'
-                      : 'bg-gray-100 border-gray-300'
-                  }`}
-                >
+                <div key={item.id} className="rounded-2xl p-3 border bg-gray-100 border-gray-300">
                   <div className="flex items-center justify-between gap-2">
                     <div className="text-sm font-bold text-gray-800">{item.rule_id}</div>
-                    {item.action_type === 'UI_ALERT' && (
-                      <div className="text-[10px] font-black tracking-widest text-yellow-900 bg-yellow-300 px-2 py-1 rounded-full">
-                        ALERT
-                      </div>
-                    )}
                   </div>
                   <div className="text-xs text-gray-600">
-                    {item.source_name} / {item.metric_key} = {item.observed_value}
+                    Triggered by: {item.source_name} ({item.metric_key}) = {item.observed_value}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    {item.target} {item.payload}
+                    Action: SET {item.actuator_name} to {item.actuator_state}
                   </div>
                   <div className="text-xs text-gray-400 mt-1">{item.event_timestamp}</div>
                 </div>
