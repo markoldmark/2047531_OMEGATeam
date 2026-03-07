@@ -22,6 +22,6 @@ CREATE TABLE automation_rules (
 
 -- Esempio di regola iniziale coerente con le US
 INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
-VALUES ('rule_001', 'Raffreddamento Serra', 'greenhouse_temperature', 'value', '>', '28', 'ACTUATOR_COMMAND', 'cooling_fan', 'ON');
+VALUES ('rule_001', 'Raffreddamento Serra', 'greenhouse_temperature', 'value', '>', '2', 'ACTUATOR_COMMAND', 'cooling_fan', 'ON');
 INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
 VALUES ('rule_002', 'Raffreddamento Serra', 'greenhouse_temperature', 'value', '>', '5', 'UI_ALERT', 'habitat_heater', 'ON');
