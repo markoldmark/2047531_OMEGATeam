@@ -70,6 +70,8 @@ services:
     container_name: BE_presentation
     environment:
       - RABBITMQ_HOST=rabbitmq
+    stdin_open: true # <--- Aggiungi queste due righe per evitare
+    tty: true
     ports:
       - "8000:8000" # Porta esposta per far collegare il frontend
     depends_on:

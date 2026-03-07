@@ -4,6 +4,8 @@ import VerticalBarGauge from './VerticalBarGauge';
 import HorizontalBarGauge from './HorizontalBarGauge';
 import WarningLight from './WarningLight';
 
+import { useMarsData } from '../services/useMarsData';
+
 const MarsDashboard = () => {
   const [isAuto, setIsAuto] = useState(true);
 
@@ -14,28 +16,14 @@ const MarsDashboard = () => {
     hallVentilation: false,
   });
 
-  const [sensorData, setSensorData] = useState({
-    co2: 400,
-    radiation: 2.5,
-    power: 75
-  });
+  // MAGIA: Tutta la logica complessa si riduce a questa singola riga!
+  const sensorData = useMarsData();
 
   const toggleActuator = (name) => {
     if (!isAuto) {
       setActuators((prev) => ({ ...prev, [name]: !prev[name] }));
     }
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSensorData({
-        co2: 380 + Math.random() * 50,
-        radiation: 1.5 + Math.random() * 3,
-        power: 70 + Math.random() * 15
-      });
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-200 flex items-center justify-center p-8 font-sans">
@@ -67,7 +55,7 @@ const MarsDashboard = () => {
                   label="wlev" 
                   unit="%" 
                   fillColor="bg-blue-500" 
-                  tickCount={5} 
+                  tickCount={5}
                 />
               </div>
 
