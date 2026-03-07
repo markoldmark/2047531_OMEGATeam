@@ -55,7 +55,6 @@ async def listen_to_topic(topic, exchange):
                         aio_pika.Message(body=json.dumps(event).encode()),
                         routing_key=""
                     )
-                    print(f"[TELEMETRY] -> Inviato a RabbitMQ: {topic}")
                     
         except websockets.exceptions.ConnectionClosed:
             print(f"Connessione persa per {topic}. Riconnessione...")

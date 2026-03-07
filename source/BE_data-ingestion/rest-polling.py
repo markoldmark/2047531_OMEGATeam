@@ -68,7 +68,6 @@ def start_polling():
                     routing_key='', # Non serve con 'fanout'
                     body=json.dumps(event)
                 )
-                print(f"[REST] -> Inviato a RabbitMQ: {sensor}")
         
         time.sleep(POLLING_INTERVAL)
 

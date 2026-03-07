@@ -18,7 +18,7 @@ export const useMarsData = () => {
     if (socketRef.current) return;
 
     console.log("Tentativo di connessione a Marte...");
-    const ws = new WebSocket(`ws://${window.location.host}/ws/stream`);
+    const ws = new WebSocket('ws://127.0.0.1:8000/ws/stream');
     socketRef.current = ws;
 
     ws.onopen = () => {
