@@ -10,9 +10,9 @@ The core of the system is a Rule Engine that evaluates incoming normalized event
 ## 2. User Stories
 
 ### Botanist
-* **US1:** As a Botanist, if the `greenhouse_temperature` rises above 35 degrees, activate the `cooling_fan`.
-* **US2:** As a Botanist, if the `greenhouse_temperature` falls below 5 degrees, activate the `habitat_heater`.
-* **US3:** As a Botanist, if the `water_tank_level` falls below 10%., deactivate the `entrance_humidifier`.
+* **US1:** As a Botanist, if the `greenhouse_temperature` rises above 32 degrees, activate the `cooling_fan`.
+* **US2:** As a Botanist, if the `greenhouse_temperature` falls below 25 degrees, activate the `habitat_heater`.
+* **US3:** As a Botanist, if the `water_tank_level` falls below 60%., deactivate the `entrance_humidifier`.
 * **US4:** As a Botanist, if the `hydroponic_ph` rises above 9, a warning UI light is turned on to block nutrients.
 
 ### Safety Manager

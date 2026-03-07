@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import OdometerGauge from './OdometerGauge';
 import VerticalBarGauge from './VerticalBarGauge';
 import HorizontalBarGauge from './HorizontalBarGauge';
@@ -18,13 +18,31 @@ const MarsDashboard = () => {
     entranceHumidifier: false,
     hallVentilation: false,
   });
+  const [manualError, setManualError] = useState('');
 
   // MAGIA: Tutta la logica complessa si riduce a questa singola riga!
-  const sensorData = useMarsData();
+  const { sensorData, rules, history, sendActuatorCommand } = useMarsData();
 
-  const toggleActuator = (name) => {
+  const actuatorMap = {
+    coolingFan: 'cooling_fan',
+    habitatHeater: 'habitat_heater',
+    entranceHumidifier: 'entrance_humidifier',
+    hallVentilation: 'hall_ventilation',
+  };
+
+  const toggleActuator = async (name) => {
     if (!isAuto) {
-      setActuators((prev) => ({ ...prev, [name]: !prev[name] }));
+      const nextValue = !actuators[name];
+      const actuatorName = actuatorMap[name];
+
+      try {
+        setManualError('');
+        await sendActuatorCommand(actuatorName, nextValue ? 'ON' : 'OFF');
+        setActuators((prev) => ({ ...prev, [name]: nextValue }));
+      } catch (error) {
+        console.error('Errore manual override:', error);
+        setManualError('Manual override non riuscito');
+      }
     }
   };
 
@@ -269,6 +287,84 @@ const MarsDashboard = () => {
             </div>
 
             <span className={`font-bold text-2xl ${isAuto ? 'text-white' : 'text-gray-400'}`}>A</span>
+          </div>
+        </div>
+
+        {manualError && (
+          <div className="bg-red-100 text-red-700 border border-red-300 rounded-2xl px-4 py-3 text-sm font-semibold">
+            {manualError}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-6">
+          <div className="bg-white rounded-[30px] p-5 border-4 border-gray-400 shadow-inner min-h-[220px]">
+            <div className="text-black font-bold text-xl tracking-widest uppercase mb-4">rules</div>
+            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto">
+              {rules.length === 0 && (
+                <div className="text-sm text-gray-500">No rules available</div>
+              )}
+              {rules.map((rule) => (
+                <div
+                  key={rule.rule_id}
+                  className={`rounded-2xl p-3 border ${
+                    rule.action_type === 'UI_ALERT'
+                      ? 'bg-yellow-100 border-yellow-400'
+                      : 'bg-gray-100 border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-sm font-bold text-gray-800">{rule.rule_id}</div>
+                    {rule.action_type === 'UI_ALERT' && (
+                      <div className="text-[10px] font-black tracking-widest text-yellow-900 bg-yellow-300 px-2 py-1 rounded-full">
+                        ALERT
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-700">{rule.description}</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {rule.source_name} {rule.operator} {rule.threshold} {"->"} {rule.target} {rule.payload}
+                  </div>
+                  <div className="text-xs mt-2 font-semibold">
+                    {rule.is_active ? 'ACTIVE' : 'INACTIVE'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-[30px] p-5 border-4 border-gray-400 shadow-inner min-h-[220px]">
+            <div className="text-black font-bold text-xl tracking-widest uppercase mb-4">history</div>
+            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto">
+              {history.length === 0 && (
+                <div className="text-sm text-gray-500">No trigger history yet</div>
+              )}
+              {history.map((item) => (
+                <div
+                  key={item.id}
+                  className={`rounded-2xl p-3 border ${
+                    item.action_type === 'UI_ALERT'
+                      ? 'bg-yellow-100 border-yellow-400'
+                      : 'bg-gray-100 border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-sm font-bold text-gray-800">{item.rule_id}</div>
+                    {item.action_type === 'UI_ALERT' && (
+                      <div className="text-[10px] font-black tracking-widest text-yellow-900 bg-yellow-300 px-2 py-1 rounded-full">
+                        ALERT
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    {item.source_name} / {item.metric_key} = {item.observed_value}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {item.target} {item.payload}
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">{item.event_timestamp}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
