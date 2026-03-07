@@ -5,6 +5,7 @@ import HorizontalBarGauge from './HorizontalBarGauge';
 import WarningLight from './WarningLight';
 import PressureDisplay from './PressureDisplay';
 import TempGraph from './TempGraph';
+import Spy from './Spy';
 
 import { useMarsData } from '../services/useMarsData';
 
@@ -43,8 +44,8 @@ const MarsDashboard = () => {
               <div className="flex gap-6 h-full">
                 <VerticalBarGauge 
                   value={sensorData.greenhouse_temp} // <-- Collegato al dato reale
-                  min={20} 
-                  max={40} 
+                  min={10} 
+                  max={35} 
                   label="temp" 
                   unit="°C" 
                   fillColor="bg-red-500" 
@@ -97,12 +98,11 @@ const MarsDashboard = () => {
               
               {/* Colonna Sinistra: CO2 Gauge */}
               <div className="flex flex-col items-center mt-4">
-                <div className="text-black font-bold text-lg mb-[-10px]">CO2</div>
                 <OdometerGauge 
                   value={sensorData.co2 || 900} 
                   min={550} 
                   max={1000} 
-                  label="" 
+                  label="co2" 
                   needleColor="bg-red-600" 
                 />
               </div>
@@ -152,48 +152,85 @@ const MarsDashboard = () => {
              </div>
               <div className="flex flex-col justify-start items-end align-center w-full">
                 <div className="flex items-baseline justify-between gap-2 w-full">
-                  <span className="text-xs font-bold text-gray-800 uppercase tracking-widest mt-auto ml-2">PH</span>
                   <WarningLight isOn={true} text="!" activeColor="bg-yellow-400"/>
                 </div>
                 <div className="flex flex-row justify-end content-center gap-4 w-full">
                     <HorizontalBarGauge 
                       value={12} // Valore di esempio
                       min={0} 
-                      max={50} 
+                      max={20} 
                       label="cycles" 
                       fillColor="bg-blue-600" 
                       emptyColor="bg-blue-200"
                     />
                   </div>
                 </div>
+                <div className="flex flex-col gap-3 items-end justify-start mr-40 mt-[-220px]">
+                 {/* Chiamata tripla al componente Spy con label diverse */}
+                <Spy label="D" isOn={sensorData.statusD} />
+                <Spy label="P" isOn={sensorData.statusP} />
+                <Spy label="I" isOn={sensorData.statusI} />
+              </div>
              {/* Titolo ancorato in basso */}
-             <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70">airlock</div>
+             <div className="mt-auto pt-4 flex justify-center"> 
+      {/* mt-auto spinge questo div in fondo al contenitore flex */}
+      {/* justify-end lo sposta a destra, usa justify-center se lo vuoi al centro */}
+      <div className="text-black font-bold text-xl tracking-widest uppercase opacity-80">
+        airlock
+      </div>
+    </div>
           </div>
 
-          {/* 4. POWER (Titolo in basso) */}
-          <div className="bg-red-200 rounded-[30px] border-[3px] border-gray-500 p-6 flex flex-col shadow-inner">
-             {/* Spazio flessibile per raggruppare i contenuti in alto */}
-             <div className="flex flex-col flex-grow">
-               <div className="flex justify-between items-start w-full">
-                  <div className="text-center ml-8">
-                    <OdometerGauge value={sensorData.power} min={0} max={100} label="power %" needleColor="bg-orange-500" />
-                  </div>
-                  <div className="flex justify-end gap-4">
-                    <div className="flex gap-4">
-                      <div className="w-1 h-32 border-l-4 border-dotted border-gray-600"></div>
-                      <div className="w-1 h-32 border-l-4 border-dotted border-gray-600"></div>
-                    </div>
-                    <div className="flex items-end gap-2 ml-8">
-                      <div className="w-10 h-20 bg-gray-200 border-2 border-gray-500"></div>
-                      <div className="w-10 h-20 bg-gray-200 border-2 border-gray-500"></div>
-                    </div>
-                  </div>
-               </div>
-             </div>
-             {/* Titolo ancorato in basso (stesso margine di airlock) */}
-             <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mt-auto">power</div>
-          </div>
+          
+            {/* 4. POWER - Rimpicciolito con larghezza contenuta */}
+            <div className="bg-[#fed7aa] rounded-[30px] border-[3px] border-gray-500 p-6 flex flex-col shadow-inner">
 
+              <div className="flex flex-row justify-between items-center flex-grow px-2 scale-90 origin-center">
+                {/* 'scale-90' rimpicciolisce tutto il blocco strumenti mantenendo le proporzioni interne */}
+                
+                {/* PARTE SINISTRA: Odometer tloop (Compatto) */}
+                <div className="flex flex-col items-center relative pt-8">
+                  <div className="scale-75"> {/* Rimpicciolisce solo il calibro */}
+                    <OdometerGauge 
+                      value={sensorData.tloop || 35} 
+                      min={10} max={55} 
+                      label="tloop" 
+                      needleColor="bg-orange-500" 
+                    />
+                  </div>
+                </div>
+
+                {/* PARTE DESTRA: VerticalBarGauge (Altezza ridotta) */}
+                <div className="flex flex-row items-end gap-6 h-48 mb-4"> 
+                  {/* 'h-48' invece di 'h-64' rende le barre visibilmente più basse */}
+                  
+                  {/* Gruppo Elettrico */}
+                  <div className="flex gap-3 h-full">
+                    <div className="flex flex-col items-center h-full justify-end">
+                      <VerticalBarGauge value={sensorData.voltage || 220} min={0} max={400} label="v" fillColor="bg-gray-100" />
+                    </div>
+                    <div className="flex flex-col items-center h-full justify-end">
+                      <VerticalBarGauge value={sensorData.ampere || 15} min={0} max={50} label="a" fillColor="bg-gray-100" />
+                    </div>
+                  </div>
+
+                  {/* Gruppo Flusso Energetico */}
+                  <div className="flex gap-3 h-full border-l border-black/10 pl-4"> 
+                    <div className="flex flex-col items-center h-full justify-end">
+                      <VerticalBarGauge value={sensorData.production || 80} min={0} max={100} label="pro"fillColor="bg-green-600" />
+                    </div>
+                    <div className="flex flex-col items-center h-full justify-end">
+                      <VerticalBarGauge value={sensorData.consumption || 60} min={0} max={100} label="cons" fillColor="bg-red-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Watermark in basso più discreto */}
+              <div className="text-black font-bold text-xl tracking-widest uppercase opacity-80">
+        power
+      </div>
+            </div>
           {/* CENTER ACTUATORS */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#d1d5db] p-3 rounded-[30px] border-[3px] border-gray-500">
             <div className="grid grid-cols-2 gap-2 w-[300px] h-[200px]">
