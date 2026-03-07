@@ -104,11 +104,20 @@ async def create_rule(rule: RuleSchema):
 @app.websocket("/ws/stream")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+
     active_connections.add(websocket) # Usa il set dichiarato globalmente
+
     try:
         await websocket.send_json({"type": "INIT_STATE", "data": latest_state_cache})
         while True:
+            # Mantieni la connessione aperta ascoltando i messaggi dal frontend
             await websocket.receive_text()
-    except Exception:
+            
+    except WebSocketDisconnect:
+        # Gestisci la disconnessione pulita rimuovendo il socket dal set
+        active_connections.remove(websocket)
+    except Exception as e:
+        print(f"Errore imprevisto WebSocket: {e}")
+        # Rimuovi la connessione in caso di altri errori
         if websocket in active_connections:
             active_connections.remove(websocket)

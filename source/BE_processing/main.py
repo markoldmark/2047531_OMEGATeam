@@ -59,8 +59,6 @@ async def process_message(message: aio_pika.IncomingMessage):
         event = json.loads(message.body.decode())
         source = event.get("source_name")
         measurements = event.get("measurements", {})
-
-        print(f"[DEBUG] Analisi evento da: {source}")
         
         rules = fetch_rules()
         for rule in rules:
