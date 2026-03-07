@@ -4,7 +4,7 @@ import VerticalBarGauge from './VerticalBarGauge';
 import HorizontalBarGauge from './HorizontalBarGauge';
 import WarningLight from './WarningLight';
 import PressureDisplay from './PressureDisplay';
-import TempGraph from './TempGraph';
+import O2Graph from './O2Graph';
 import Spy from './Spy';
 
 import { useMarsData } from '../services/useMarsData';
@@ -124,7 +124,7 @@ const MarsDashboard = () => {
 
               <div className="flex flex-col gap-4 scale-50 items-center justify-start">
                 <div className="flex flex-col items-center justify-start">
-                  <TempGraph data={sensorData.tempHistory || [45, 30, 40, 25, 50, 35, 45]} label="temp" />
+                  <O2Graph data={sensorData.oxygen_history || []} label="o2 %" />
                 </div>
                 <div className="flex flex-col items-center">
                   <PressureDisplay value={sensorData.pressure} label="" />

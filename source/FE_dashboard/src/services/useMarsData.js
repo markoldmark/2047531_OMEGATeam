@@ -43,10 +43,8 @@ export const sendActuatorCommand = async (actuatorName, state) => {
   return response.json();
 };
 
-
 // --- 2. PARSER DEI DATI WEBSOCKET ---
 
-// Helper generici
 const getInitVal = (cache, source, extractor) => {
   if (cache[source] && cache[source].measurements) {
     return extractor(cache[source].measurements);
@@ -70,30 +68,34 @@ const mapActuatorStates = (payload) => {
   };
 };
 
-// Parser per l'evento 'INIT_STATE'
-const processInitState = (cache, prev) => ({
-  ...prev,
-  greenhouse_temp: getInitVal(cache, 'greenhouse_temperature', d => d.value) ?? prev.greenhouse_temp,
-  water_level: getInitVal(cache, 'water_tank_level', d => d.level_pct) ?? prev.water_level,
-  ph: getInitVal(cache, 'hydroponic_ph', d => d.measurements?.find(m => m.metric === 'ph')?.value) ?? prev.ph,
-  co2: getInitVal(cache, 'co2_hall', d => d.value) ?? getInitVal(cache, 'mars/telemetry/life_support', d => d.measurements?.find(m => m.metric.includes('co2'))?.value) ?? prev.co2,
-  radiation: getInitVal(cache, 'mars/telemetry/radiation', d => d.measurements?.find(m => m.metric.includes('radiation'))?.value) ?? prev.radiation,
-  power: getInitVal(cache, 'mars/telemetry/power_consumption', d => d.power_kw) ?? getInitVal(cache, 'mars/telemetry/power_bus', d => d.power_kw) ?? prev.power,
-  humidity: getInitVal(cache, 'entrance_humidity', d => d.value) ?? prev.humidity,
-  pressure: getInitVal(cache, 'corridor_pressure', d => d.value) ?? prev.pressure,
-  pm25: getInitVal(cache, 'air_quality_pm25', d => d.pm25_ug_m3) ?? prev.pm25,
-  tloop: getInitVal(cache, 'mars/telemetry/thermal_loop', d => d.temperature_c) ?? prev.tloop,
-  voltage: getInitVal(cache, 'mars/telemetry/power_bus', d => d.voltage_v) ?? prev.voltage,
-  ampere: getInitVal(cache, 'mars/telemetry/power_bus', d => d.current_a) ?? prev.ampere,
-  production: getInitVal(cache, 'mars/telemetry/solar_array', d => d.power_kw) ?? prev.production,
-  consumption: getInitVal(cache, 'mars/telemetry/power_consumption', d => d.power_kw) ?? prev.consumption,
-  airlock_cycles: getInitVal(cache, 'mars/telemetry/airlock', d => d.cycles_per_hour) ?? prev.airlock_cycles,
-  statusD: getInitVal(cache, 'mars/telemetry/airlock', d => d.last_state) === 'DEPRESSURIZING',
-  statusP: getInitVal(cache, 'mars/telemetry/airlock', d => d.last_state) === 'PRESSURIZING',
-  statusI: getInitVal(cache, 'mars/telemetry/airlock', d => d.last_state) === 'IDLE' ? true : prev.statusI
-});
+const processInitState = (cache, prev) => {
+  const initTemp = getInitVal(cache, 'mars/telemetry/life_support', d => getMetric(d, 'temp')) ?? 25;
+  
+  return {
+    ...prev,
+    habitat_temp: initTemp,
+    habitat_temp_history: [initTemp],
+    greenhouse_temp: getInitVal(cache, 'greenhouse_temperature', d => d.value) ?? prev.greenhouse_temp,
+    water_level: getInitVal(cache, 'water_tank_level', d => d.level_pct) ?? prev.water_level,
+    ph: getInitVal(cache, 'hydroponic_ph', d => d.measurements?.find(m => m.metric === 'ph')?.value) ?? prev.ph,
+    co2: getInitVal(cache, 'co2_hall', d => d.value) ?? getInitVal(cache, 'mars/telemetry/life_support', d => d.measurements?.find(m => m.metric.includes('co2'))?.value) ?? prev.co2,
+    radiation: getInitVal(cache, 'mars/telemetry/radiation', d => d.measurements?.find(m => m.metric.includes('radiation'))?.value) ?? prev.radiation,
+    power: getInitVal(cache, 'mars/telemetry/power_consumption', d => d.power_kw) ?? getInitVal(cache, 'mars/telemetry/power_bus', d => d.power_kw) ?? prev.power,
+    humidity: getInitVal(cache, 'entrance_humidity', d => d.value) ?? prev.humidity,
+    pressure: getInitVal(cache, 'corridor_pressure', d => d.value) ?? prev.pressure,
+    pm25: getInitVal(cache, 'air_quality_pm25', d => d.pm25_ug_m3) ?? prev.pm25,
+    tloop: getInitVal(cache, 'mars/telemetry/thermal_loop', d => d.temperature_c) ?? prev.tloop,
+    voltage: getInitVal(cache, 'mars/telemetry/power_bus', d => d.voltage_v) ?? prev.voltage,
+    ampere: getInitVal(cache, 'mars/telemetry/power_bus', d => d.current_a) ?? prev.ampere,
+    production: getInitVal(cache, 'mars/telemetry/solar_array', d => d.power_kw) ?? prev.production,
+    consumption: getInitVal(cache, 'mars/telemetry/power_consumption', d => d.power_kw) ?? prev.consumption,
+    airlock_cycles: getInitVal(cache, 'mars/telemetry/airlock', d => d.cycles_per_hour) ?? prev.airlock_cycles,
+    statusD: getInitVal(cache, 'mars/telemetry/airlock', d => d.last_state) === 'DEPRESSURIZING',
+    statusP: getInitVal(cache, 'mars/telemetry/airlock', d => d.last_state) === 'PRESSURIZING',
+    statusI: getInitVal(cache, 'mars/telemetry/airlock', d => d.last_state) === 'IDLE' ? true : prev.statusI
+  };
+};
 
-// Parser per gli aggiornamenti in tempo reale
 const processTelemetryUpdate = (source, data, prev) => {
   const newData = { ...prev };
   let isUpdated = false;
@@ -117,8 +119,17 @@ const processTelemetryUpdate = (source, data, prev) => {
   } else if (source === 'air_quality_pm25') {
     if (data.pm25_ug_m3 !== undefined) { newData.pm25 = data.pm25_ug_m3; isUpdated = true; }
   } else if (source === 'mars/telemetry/life_support') {
-    const val = getMetric(data.measurements, 'co2');
-    if (val !== null) { newData.co2 = val; isUpdated = true; }
+    // Estraiamo la CO2 (se presente)
+    const valCo2 = getMetric(data.measurements, 'co2');
+    if (valCo2 !== null && valCo2 !== undefined) { newData.co2 = valCo2; isUpdated = true; }
+    
+    // Estraiamo l'ossigeno e aggiorniamo lo storico!
+    const valO2 = getMetric(data.measurements, 'oxygen_percent');
+    if (valO2 !== null && valO2 !== undefined) { 
+      // Manteniamo gli ultimi 30 valori
+      newData.oxygen_history = [...(prev.oxygen_history || []), valO2].slice(-30);
+      isUpdated = true; 
+    }
   } else if (source === 'mars/telemetry/radiation') {
     const val = getMetric(data.measurements, 'radiation');
     if (val !== null) { newData.radiation = val; isUpdated = true; }
@@ -145,10 +156,10 @@ const processTelemetryUpdate = (source, data, prev) => {
   return { newData, isUpdated };
 };
 
-
 // --- 3. L'HOOK PRINCIPALE ---
 
 const INITIAL_SENSOR_STATE = {
+  oxygen_history: [],
   greenhouse_temp: 0, water_level: 0, ph: 7.0, co2: 0, radiation: 0, power: 0,
   humidity: 0, pressure: 0, pm25: 0, voc: 0, tloop: 0, voltage: 0, ampere: 0,
   production: 0, consumption: 0, airlock_cycles: 0, statusD: false, statusP: false, statusI: true,
