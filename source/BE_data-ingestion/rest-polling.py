@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 
 SIMULATOR_BASE_URL = os.getenv("SIMULATOR_URL", "http://localhost:8080")
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
-POLLING_INTERVAL = 0.1
+POLLING_INTERVAL = 1
 
 REST_SENSORS = [
     "greenhouse_temperature", "entrance_humidity", "co2_hall",
