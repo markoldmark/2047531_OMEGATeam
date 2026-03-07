@@ -9,9 +9,30 @@ export const useMarsData = () => {
     radiation: 0,
     power: 0
   });
+  const [rules, setRules] = useState([]);
+  const [history, setHistory] = useState([]);
 
   // Usiamo un Ref per capire se il WebSocket è già in fase di apertura
   const socketRef = useRef(null);
+
+  const loadRulesAndHistory = async () => {
+    try {
+      const [rulesResponse, historyResponse] = await Promise.all([
+        fetch('http://127.0.0.1:8000/api/rules'),
+        fetch('http://127.0.0.1:8000/api/history')
+      ]);
+
+      if (rulesResponse.ok) {
+        setRules(await rulesResponse.json());
+      }
+
+      if (historyResponse.ok) {
+        setHistory(await historyResponse.json());
+      }
+    } catch (error) {
+      console.error('Errore caricamento rules/history:', error);
+    }
+  };
 
   useEffect(() => {
     // Se esiste già una connessione, non fare nulla (evita il doppio avvio di React 18)
@@ -22,6 +43,13 @@ export const useMarsData = () => {
     console.log("Tentativo di connessione a Marte...");
     const ws = new WebSocket('ws://127.0.0.1:8000/ws/stream');
     socketRef.current = ws;
+    const initialLoadId = setTimeout(() => {
+      loadRulesAndHistory();
+    }, 0);
+
+    const pollId = setInterval(() => {
+      loadRulesAndHistory();
+    }, 5000);
 
     ws.onopen = () => {
       console.log('✅ Connesso a Marte con successo!');
@@ -122,6 +150,8 @@ export const useMarsData = () => {
 
     // Pulizia: chiudiamo solo se il componente viene davvero rimosso
     return () => {
+      clearTimeout(initialLoadId);
+      clearInterval(pollId);
       if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
           ws.close();
       }
@@ -129,5 +159,5 @@ export const useMarsData = () => {
     };
   }, []);
 
-  return sensorData;
+  return { sensorData, rules, history };
 };
