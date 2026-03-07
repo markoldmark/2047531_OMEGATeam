@@ -33,7 +33,7 @@ const MarsDashboard = () => {
         
         <div className="relative grid grid-cols-2 grid-rows-2 gap-6 h-[600px]">
           
-          {/* 1. GREENHOUSE (Titolo in alto) */}
+          {/* 1. GREENHOUSE */}
           {/* 1. GREENHOUSE */}
           <div className="bg-green-200 rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner relative">
             <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-4">greenhouse</div>
@@ -42,7 +42,7 @@ const MarsDashboard = () => {
               
               <div className="flex gap-6 h-full">
                 <VerticalBarGauge 
-                  value={28} 
+                  value={sensorData.greenhouse_temp} // <-- Collegato al dato reale
                   min={20} 
                   max={40} 
                   label="temp" 
@@ -51,7 +51,7 @@ const MarsDashboard = () => {
                   tickCount={8} 
                 />
                 <VerticalBarGauge 
-                  value={75} 
+                  value={sensorData.water_level} // <-- Collegato al dato reale
                   min={0} 
                   max={100} 
                   label="wlev" 
@@ -64,17 +64,24 @@ const MarsDashboard = () => {
               <div className="flex flex-col justify-start items-end align-center w-full">
                 <div className="flex items-baseline justify-between gap-2 w-full">
                   <span className="text-xs font-bold text-gray-800 uppercase tracking-widest mt-auto ml-2">PH</span>
-                  <WarningLight isOn={true} text="!" activeColor="bg-yellow-400"/>
+                  
+                  {/* Spia dinamica: si accende e lampeggia se il PH è minore di 5.5 o maggiore di 7.5 */}
+                  <WarningLight 
+                    isOn={sensorData.ph < 5.5 || sensorData.ph > 7.5} 
+                    isBlinking={true}
+                    text="!" 
+                    activeColor="bg-yellow-400"
+                  />
                 </div>
                 <div className="flex flex-row justify-end content-center gap-4 w-full">
                   <HorizontalBarGauge 
-                    value={6.5} // Valore di esempio
+                    value={sensorData.ph} // <-- Collegato al dato reale
                     min={0} 
                     max={14}
                     tickCount={7}
                     label=""
                     fillColor="bg-green-500" 
-                    emptyColor="bg-green-200" // Ho tenuto lo sfondo verde chiaro del tuo design originale
+                    emptyColor="bg-green-200" 
                   />
                 </div>
               </div>

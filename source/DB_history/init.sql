@@ -1,26 +1,25 @@
+DROP TABLE IF EXISTS automation_rules;
 
-
-CREATE TABLE IF NOT EXISTS automation_rules (
+CREATE TABLE automation_rules (
     id SERIAL PRIMARY KEY,
-    sensor_name VARCHAR(100) NOT NULL,
+    rule_id VARCHAR(50) UNIQUE NOT NULL, -- Identificativo UUID o stringa
+    description TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
     
-    -- Operatori consentiti dalle specifiche
-    operator VARCHAR(2) NOT NULL CHECK (operator IN ('<', '<=', '=', '>', '>=')),
+    -- Condizione
+    source_name VARCHAR(100) NOT NULL, -- Es: greenhouse_temperature
+    metric_key VARCHAR(50) NOT NULL,   -- Es: value, pm25_ug_m3
+    operator VARCHAR(2) NOT NULL CHECK (operator IN ('>', '<', '==', '!=', '>=', '<=')),
+    threshold VARCHAR(50) NOT NULL,    -- Salvato come stringa per supportare stati tipo 'DEPRESSURIZING'
     
-    -- Valore soglia (usiamo NUMERIC per supportare sia interi che decimali)
-    threshold_value NUMERIC NOT NULL,
+    -- Azione
+    action_type VARCHAR(20) NOT NULL CHECK (action_type IN ('ACTUATOR_COMMAND', 'UI_ALERT')),
+    target VARCHAR(100) NOT NULL,      -- Nome attuatore o canale alert
+    payload VARCHAR(50) NOT NULL,      -- Stato (ON/OFF) o messaggio alert
     
-    -- L'unità di misura è opzionale secondo le specifiche
-    unit VARCHAR(20),
-    
-    actuator_name VARCHAR(100) NOT NULL,
-    
-    -- Lo stato dell'attuatore può essere solo ON o OFF
-    actuator_state VARCHAR(3) NOT NULL CHECK (actuator_state IN ('ON', 'OFF')),
-    
-    -- Data di creazione utile per log e debug
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO automation_rules (sensor_name, operator, threshold_value, unit, actuator_name, actuator_state)
-VALUES ('greenhouse_temperature', '>', 28, '°C', 'cooling_fan', 'ON');
+-- Esempio di regola iniziale coerente con le US
+INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
+VALUES ('rule_001', 'Raffreddamento Serra', 'greenhouse_temperature', 'value', '>', '28', 'ACTUATOR_COMMAND', 'cooling_fan', 'ON');

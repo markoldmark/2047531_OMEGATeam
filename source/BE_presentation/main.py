@@ -2,12 +2,14 @@ import asyncio
 import json
 import os
 import aio_pika
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI()
 
-# Permetti tutto per evitare blocchi del browser durante i test [cite: 104, 105]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,11 +19,29 @@ app.add_middleware(
 )
 
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "rabbitmq")
+DB_CONFIG = {
+    "dbname": "mars_iot_db",
+    "user": "mars_user",
+    "password": "mars_password",
+    "host": "db"
+}
+
 latest_state_cache = {}
-active_connections = set() # Usiamo un set per gestire meglio le connessioni
+active_connections = set()
+
+# Modello per la validazione delle regole in ingresso
+class RuleSchema(BaseModel):
+    rule_id: str
+    description: str
+    source_name: str
+    metric_key: str
+    operator: str
+    threshold: str
+    action_type: str
+    target: str
+    payload: str
 
 async def consume_rabbitmq():
-    """Loop di ascolto RabbitMQ [cite: 92, 131]"""
     while True:
         try:
             connection = await aio_pika.connect_robust(f"amqp://guest:guest@{RABBITMQ_HOST}/")
@@ -39,33 +59,65 @@ async def consume_rabbitmq():
                             if source:
                                 latest_state_cache[source] = payload
                             
-                            # Invio immediato ai WebSocket attivi
                             if active_connections:
-                                # Creiamo una lista di task per non bloccare il loop
                                 await asyncio.gather(*[
                                     ws.send_json(payload) for ws in active_connections
                                 ], return_exceptions=True)
         except Exception as e:
-            print(f"Errore Broker: {e}")
+            print(f"Errore Broker Presentation: {e}")
             await asyncio.sleep(5)
 
 @app.on_event("startup")
 async def startup():
     asyncio.create_task(consume_rabbitmq())
 
+# --- ENDPOINT STATO ---
 @app.get("/api/state")
 async def get_state():
     return latest_state_cache
 
+# --- ENDPOINT REGOLE (Necessari per il Processing) ---
+@app.get("/api/rules")
+async def get_rules():
+    conn = psycopg2.connect(**DB_CONFIG)
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("SELECT * FROM automation_rules")
+    rules = cur.fetchall()
+    cur.close()
+    conn.close()
+    return rules
+
+@app.post("/api/rules")
+async def create_rule(rule: RuleSchema):
+    conn = psycopg2.connect(**DB_CONFIG)
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (rule.rule_id, rule.description, rule.source_name, rule.metric_key, rule.operator, rule.threshold, rule.action_type, rule.target, rule.payload))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"status": "success"}
+
+# --- WEBSOCKET ---
 @app.websocket("/ws/stream")
 async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()  # <--- QUESTO DEVE ESSERCI
-    manager.active_connections.append(websocket)
+    await websocket.accept()
+
+    active_connections.add(websocket) # Usa il set dichiarato globalmente
+
     try:
-        # Invia lo stato iniziale
         await websocket.send_json({"type": "INIT_STATE", "data": latest_state_cache})
         while True:
-            # Mantieni la connessione aperta ascoltando (anche se non invii nulla dal FE)
+            # Mantieni la connessione aperta ascoltando i messaggi dal frontend
             await websocket.receive_text()
-    except Exception:
-        manager.disconnect(websocket)
+            
+    except WebSocketDisconnect:
+        # Gestisci la disconnessione pulita rimuovendo il socket dal set
+        active_connections.remove(websocket)
+    except Exception as e:
+        print(f"Errore imprevisto WebSocket: {e}")
+        # Rimuovi la connessione in caso di altri errori
+        if websocket in active_connections:
+            active_connections.remove(websocket)

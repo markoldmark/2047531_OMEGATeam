@@ -54,8 +54,10 @@ services:
       - SIMULATOR_URL=http://simulator:8080                 
       - SIMULATOR_WS_URL=ws://simulator:8080/api/telemetry/ws
     depends_on:
-      - simulator
-      - rabbitmq
+          rabbitmq:
+            condition: service_healthy
+          db:
+            condition: service_started
     restart: unless-stopped
 
   be_processing:
@@ -87,8 +89,10 @@ services:
     ports:
       - "8000:8000" # Porta esposta per far collegare il frontend
     depends_on:
-      - rabbitmq
-      - db
+          rabbitmq:
+            condition: service_healthy
+          db:
+            condition: service_started
     restart: unless-stopped
 
   frontend:
