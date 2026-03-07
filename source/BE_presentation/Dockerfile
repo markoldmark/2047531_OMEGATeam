@@ -5,7 +5,7 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1
 
 # Installiamo FastAPI, Uvicorn (il server) e il client RabbitMQ
-RUN pip install --no-cache-dir fastapi "uvicorn[standard]" aio-pika websockets
+RUN pip install --no-cache-dir fastapi "uvicorn[standard]" aio-pika websockets psycopg2-binary pydantic
 
 COPY . .
 
