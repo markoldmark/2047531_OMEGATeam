@@ -79,7 +79,7 @@ const MarsDashboard = () => {
             
             <div className="flex flex-row justify-between items-start gap-4">
               <div className="flex flex-col items-center mt-4">
-                <OdometerGauge value={sensorData.co2} min={550} max={1000} label="co2" needleColor="bg-red-600" />
+                <OdometerGauge value={sensorData.co2} min={500} max={1500} label="co2" needleColor="bg-red-600" />
               </div>
 
               <div className="flex flex-col gap-4 scale-75 mt-[-40px] items-center">
@@ -93,7 +93,7 @@ const MarsDashboard = () => {
               </div>
 
               <div className="flex gap-6 h-[70%] mt-2">
-                <VerticalBarGauge value={sensorData.pm25} min={0} max={50} label="pm25" unit="" fillColor="bg-red-600" tickCount={5} />
+                <VerticalBarGauge value={sensorData.pm25} min={0} max={100} label="pm25" unit="" fillColor="bg-red-600" tickCount={5} />
                 <VerticalBarGauge value={sensorData.humidity} min={0} max={100} label="hum" unit="%" fillColor="bg-white" tickCount={5} />
               </div>
             </div>
@@ -139,19 +139,19 @@ const MarsDashboard = () => {
               <div className="flex flex-row items-end gap-6 h-48 mb-4"> 
                 <div className="flex gap-3 h-full">
                   <div className="flex flex-col items-center h-full justify-end">
-                    <VerticalBarGauge value={sensorData.voltage} min={0} max={400} label="v" fillColor="bg-gray-100" />
+                    <VerticalBarGauge value={sensorData.voltage} min={0} max={800} label="v" fillColor="bg-gray-100" />
                   </div>
                   <div className="flex flex-col items-center h-full justify-end">
-                    <VerticalBarGauge value={sensorData.ampere} min={0} max={50} label="a" fillColor="bg-gray-100" />
+                    <VerticalBarGauge value={sensorData.ampere} min={0} max={400} label="a" fillColor="bg-gray-100" />
                   </div>
                 </div>
 
                 <div className="flex gap-3 h-full border-l border-black/10 pl-4"> 
                   <div className="flex flex-col items-center h-full justify-end">
-                    <VerticalBarGauge value={sensorData.production} min={0} max={100} label="pro" fillColor="bg-green-600" />
+                    <VerticalBarGauge value={sensorData.production} min={0} max={300} label="pro" fillColor="bg-green-600" />
                   </div>
                   <div className="flex flex-col items-center h-full justify-end">
-                    <VerticalBarGauge value={sensorData.consumption} min={0} max={100} label="cons" fillColor="bg-red-600" />
+                    <VerticalBarGauge value={sensorData.consumption} min={0} max={300} label="cons" fillColor="bg-red-600" />
                   </div>
                 </div>
               </div>
