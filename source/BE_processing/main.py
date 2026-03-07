@@ -18,6 +18,7 @@ DB_CONFIG = {
     "host": "db"
 }
 SIMULATOR_URL = os.getenv("SIMULATOR_URL", "http://simulator:8080")
+rule_activation_state = {}
 
 def get_db_connection():
     """Crea una connessione al database delle regole."""
@@ -93,6 +94,14 @@ def extract_metric_value(measurements, metric_key):
 
     return None
 
+
+def should_emit_trigger(rule_id, condition_met):
+    """Emette un trigger solo sul fronte di attivazione della regola."""
+    was_active = rule_activation_state.get(rule_id, False)
+    rule_activation_state[rule_id] = condition_met
+    return condition_met and not was_active
+
+
 async def process_message(message: aio_pika.IncomingMessage, exchange):
     """Processa un evento dal broker e valuta le regole compatibili."""
     async with message.process():
@@ -109,7 +118,8 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
                 current_value = extract_metric_value(measurements, rule['metric_key'])
                 
                 if current_value is not None:
-                    if evaluate_condition(current_value, rule['operator'], rule['threshold']):
+                    condition_met = evaluate_condition(current_value, rule['operator'], rule['threshold'])
+                    if should_emit_trigger(rule['rule_id'], condition_met):
                         if rule['action_type'] == 'ACTUATOR_COMMAND':
                             await trigger_actuator(rule['target'], rule['payload'])
                             print(f"[RULE TRIGGERED] {rule['rule_id']}: {rule['target']} -> {rule['payload']}")

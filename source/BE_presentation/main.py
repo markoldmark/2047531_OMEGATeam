@@ -22,6 +22,7 @@ app.add_middleware(
 
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "rabbitmq")
 SIMULATOR_URL = os.getenv("SIMULATOR_URL", "http://simulator:8080")
+MAX_RULE_HISTORY = 50
 DB_CONFIG = {
     "dbname": "mars_iot_db",
     "user": "mars_user",
@@ -98,7 +99,7 @@ async def consume_rabbitmq():
                             payload = json.loads(message.body.decode())
                             if payload.get("event_type") == "RULE_TRIGGER":
                                 rule_history_cache.insert(0, payload)
-                                del rule_history_cache[200:]
+                                del rule_history_cache[MAX_RULE_HISTORY:]
                                 continue
 
                             source = payload.get("source_name")
