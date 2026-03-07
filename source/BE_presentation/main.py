@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+from urllib import error, request
 
 import aio_pika
 import psycopg2
@@ -20,6 +21,7 @@ app.add_middleware(
 )
 
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "rabbitmq")
+SIMULATOR_URL = os.getenv("SIMULATOR_URL", "http://simulator:8080")
 DB_CONFIG = {
     "dbname": "mars_iot_db",
     "user": "mars_user",
@@ -50,9 +52,34 @@ class RuleStatusUpdate(BaseModel):
     is_active: bool
 
 
+class ActuatorCommand(BaseModel):
+    state: str
+
+
 def get_db_connection():
     """Crea una connessione al database delle regole."""
     return psycopg2.connect(**DB_CONFIG)
+
+
+def send_actuator_command(actuator_name: str, state: str):
+    """Invia un comando manuale al simulatore per aggiornare un attuatore."""
+    payload = json.dumps({"state": state}).encode("utf-8")
+    actuator_request = request.Request(
+        f"{SIMULATOR_URL}/api/actuators/{actuator_name}",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    try:
+        with request.urlopen(actuator_request, timeout=5) as response:
+            body = response.read().decode("utf-8")
+            return json.loads(body) if body else {"status": "success"}
+    except error.HTTPError as exc:
+        detail = exc.read().decode("utf-8") or "Actuator command failed"
+        raise HTTPException(status_code=exc.code, detail=detail) from exc
+    except error.URLError as exc:
+        raise HTTPException(status_code=502, detail="Simulator unreachable") from exc
 
 async def consume_rabbitmq():
     """Consuma eventi dal broker, aggiornando stato live e history volatile."""
@@ -175,6 +202,22 @@ async def update_rule(rule_id: str, update: RuleStatusUpdate):
 async def get_history(limit: int = Query(default=50, ge=1, le=500)):
     """Restituisce la history dei trigger mantenuta solo in memoria."""
     return rule_history_cache[:limit]
+
+
+@app.post("/api/actuators/{actuator_name}")
+async def manual_override_actuator(actuator_name: str, command: ActuatorCommand):
+    """Esegue un manual override su un attuatore tramite il simulatore REST."""
+    normalized_state = command.state.upper()
+    if normalized_state not in {"ON", "OFF"}:
+        raise HTTPException(status_code=400, detail="State must be ON or OFF")
+
+    simulator_response = send_actuator_command(actuator_name, normalized_state)
+    return {
+        "status": "success",
+        "actuator_name": actuator_name,
+        "state": normalized_state,
+        "simulator_response": simulator_response,
+    }
 
 # --- WEBSOCKET ---
 @app.websocket("/ws/stream")

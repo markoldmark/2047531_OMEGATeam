@@ -34,6 +34,23 @@ export const useMarsData = () => {
     }
   };
 
+  const sendActuatorCommand = async (actuatorName, state) => {
+    const response = await fetch(`http://127.0.0.1:8000/api/actuators/${actuatorName}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ state }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || 'Errore comando attuatore');
+    }
+
+    return response.json();
+  };
+
   useEffect(() => {
     // Se esiste già una connessione, non fare nulla (evita il doppio avvio di React 18)
     if (socketRef.current && socketRef.current.readyState !== WebSocket.CLOSED) {
@@ -159,5 +176,5 @@ export const useMarsData = () => {
     };
   }, []);
 
-  return { sensorData, rules, history };
+  return { sensorData, rules, history, sendActuatorCommand };
 };

@@ -17,13 +17,31 @@ const MarsDashboard = () => {
     entranceHumidifier: false,
     hallVentilation: false,
   });
+  const [manualError, setManualError] = useState('');
 
   // MAGIA: Tutta la logica complessa si riduce a questa singola riga!
-  const { sensorData, rules, history } = useMarsData();
+  const { sensorData, rules, history, sendActuatorCommand } = useMarsData();
 
-  const toggleActuator = (name) => {
+  const actuatorMap = {
+    coolingFan: 'cooling_fan',
+    habitatHeater: 'habitat_heater',
+    entranceHumidifier: 'entrance_humidifier',
+    hallVentilation: 'hall_ventilation',
+  };
+
+  const toggleActuator = async (name) => {
     if (!isAuto) {
-      setActuators((prev) => ({ ...prev, [name]: !prev[name] }));
+      const nextValue = !actuators[name];
+      const actuatorName = actuatorMap[name];
+
+      try {
+        setManualError('');
+        await sendActuatorCommand(actuatorName, nextValue ? 'ON' : 'OFF');
+        setActuators((prev) => ({ ...prev, [name]: nextValue }));
+      } catch (error) {
+        console.error('Errore manual override:', error);
+        setManualError('Manual override non riuscito');
+      }
     }
   };
 
@@ -234,6 +252,12 @@ const MarsDashboard = () => {
             <span className={`font-bold text-2xl ${isAuto ? 'text-white' : 'text-gray-400'}`}>A</span>
           </div>
         </div>
+
+        {manualError && (
+          <div className="bg-red-100 text-red-700 border border-red-300 rounded-2xl px-4 py-3 text-sm font-semibold">
+            {manualError}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-6">
           <div className="bg-white rounded-[30px] p-5 border-4 border-gray-400 shadow-inner min-h-[220px]">
