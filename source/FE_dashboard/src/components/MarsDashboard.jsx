@@ -3,6 +3,8 @@ import OdometerGauge from './OdometerGauge';
 import VerticalBarGauge from './VerticalBarGauge';
 import HorizontalBarGauge from './HorizontalBarGauge';
 import WarningLight from './WarningLight';
+import PressureDisplay from './PressureDisplay';
+import TempGraph from './TempGraph';
 
 import { useMarsData } from '../services/useMarsData';
 
@@ -41,8 +43,8 @@ const MarsDashboard = () => {
               <div className="flex gap-6 h-full">
                 <VerticalBarGauge 
                   value={28} 
-                  min={-20} 
-                  max={50} 
+                  min={20} 
+                  max={40} 
                   label="temp" 
                   unit="°C" 
                   fillColor="bg-red-500" 
@@ -79,29 +81,61 @@ const MarsDashboard = () => {
 
             </div>
           </div>
-
-          {/* 2. HABITAT (Titolo in alto) */}
-          <div className="bg-yellow-200 rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner">
-             {/* Titolo ancorato in alto */}
-            <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-4">habitat</div>
+         {/* 2. HABITAT */}
+          <div className="bg-[#fef3c7] rounded-[40px] border-[3px] border-[#333] p-6 flex flex-col shadow-2xl relative min-w-[500px]">
+            {/* Titolo Habitat */}
+            <div className="text-left text-[#4b5563] font-bold text-2xl tracking-widest uppercase mb-2 ml-4">habitat</div>
             
-            <div className="flex justify-between items-start flex-grow">
-               <OdometerGauge value={sensorData.co2} min={300} max={600} label="co2 ppm" needleColor="bg-red-600" />
-               <div className="w-32 h-20 bg-gray-200 border-4 border-gray-500 rounded-xl">
-                  <svg viewBox="0 0 100 50" className="w-full h-full stroke-red-600 stroke-[3] fill-transparent">
-                    <path d="M0,40 Q20,10 40,30 T80,10 L100,20" />
-                  </svg>
-               </div>
-            </div>
-            <div className="flex justify-between items-end mt-4">
-              <div className="w-20 h-16 bg-gray-200 border-4 border-gray-500 rounded-xl flex items-center justify-center text-2xl font-black text-gray-700">95</div>
-              <div className="flex gap-6">
-                <div className="w-8 h-24 bg-gray-300 border-2 border-gray-500"></div>
-                <div className="w-8 h-24 bg-gray-300 border-2 border-gray-500"></div>
+            <div className="flex flex-row justify-between items-start gap-4">
+              
+              {/* Colonna Sinistra: CO2 Gauge */}
+              <div className="flex flex-col items-center mt-4">
+                <div className="text-black font-bold text-lg mb-[-10px]">CO2</div>
+                <OdometerGauge 
+                  value={sensorData.co2 || 900} 
+                  min={550} 
+                  max={1000} 
+                  label="" 
+                  needleColor="bg-red-600" 
+                />
               </div>
+
+              {/* Colonna Centrale: Temp Graph e Pressure Display */}
+              <div className="flex flex-col gap-4 scale-75 mt-[-40px] items-center">
+                <div className="flex flex-col items-center">
+                  <TempGraph  data={sensorData.tempHistory || [45, 30, 40, 25, 50, 35, 45]}  label="temp" />
+                  </div>
+
+                <div className="flex flex-col items-center">
+                  <PressureDisplay value={sensorData.pressure || 95} label="" />
+                  <div className="text-black font-bold text-sm mt-1 uppercase tracking-tighter">press</div>
+                </div>
+              </div>
+
+              {/* Colonna Destra: PM25 e HUM usando VerticalBarGauge */}
+              <div className="flex gap-6 h-[70%] mt-2">
+                <VerticalBarGauge 
+                  value={sensorData.pm25 || 25} 
+                  min={0} 
+                  max={50} 
+                  label="pm25" 
+                  unit="" 
+                  fillColor="bg-red-600" 
+                  tickCount={5} 
+                />
+                <VerticalBarGauge 
+                  value={sensorData.humidity || 45} 
+                  min={0} 
+                  max={100} 
+                  label="hum" 
+                  unit="%" 
+                  fillColor="bg-white" 
+                  tickCount={5}
+                />
+              </div>
+
             </div>
           </div>
-
           {/* 3. AIRLOCK (Titolo in basso) */}
           <div className="bg-cyan-200 rounded-[30px] border-[3px] border-gray-500 p-6 flex flex-col shadow-inner">
              <div className="flex justify-between w-[40%]">
@@ -109,9 +143,12 @@ const MarsDashboard = () => {
                   <OdometerGauge value={sensorData.radiation} min={0} max={10} label="radiation" needleColor="bg-blue-600" />
                 </div>
              </div>
-             <div className="flex items-end justify-between w-full mt-auto mb-4">
-                <div className="w-2/3">
-                  <div className="w-full mt-2">
+              <div className="flex flex-col justify-start items-end align-center w-full">
+                <div className="flex items-baseline justify-between gap-2 w-full">
+                  <span className="text-xs font-bold text-gray-800 uppercase tracking-widest mt-auto ml-2">PH</span>
+                  <WarningLight isOn={true} text="!" activeColor="bg-yellow-400"/>
+                </div>
+                <div className="flex flex-row justify-end content-center gap-4 w-full">
                     <HorizontalBarGauge 
                       value={12} // Valore di esempio
                       min={0} 
@@ -122,7 +159,6 @@ const MarsDashboard = () => {
                     />
                   </div>
                 </div>
-             </div>
              {/* Titolo ancorato in basso */}
              <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70">airlock</div>
           </div>
