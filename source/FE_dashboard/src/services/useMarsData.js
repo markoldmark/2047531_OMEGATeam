@@ -172,7 +172,6 @@ export const useMarsData = () => {
           const { newData, isUpdated } = processTelemetryUpdate(message.source_name, message.measurements, prev);
           
           if (isUpdated) {
-            console.log(`[UI UPDATE] ${message.source_name}:`, newData);
             return newData;
           }
           return prev;
