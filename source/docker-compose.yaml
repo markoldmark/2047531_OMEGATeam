@@ -40,8 +40,8 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5672:5672"   # Porta di comunicazione per i microservizi
-      - "15672:15672" # Porta per la dashboard visiva di RabbitMQ (Aprila nel browser!)
+      - "5672:5672"
+      - "15672:15672"
     restart: unless-stopped
 
   be_ingestion:
