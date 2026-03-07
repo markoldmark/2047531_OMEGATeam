@@ -13,7 +13,7 @@ CREATE TABLE automation_rules (
     threshold VARCHAR(50) NOT NULL,    -- Salvato come stringa per supportare stati tipo 'DEPRESSURIZING'
     
     -- Azione
-    action_type VARCHAR(20) NOT NULL CHECK (action_type IN ('ACTUATOR_COMMAND', 'UI_ALERT')),
+    action_type VARCHAR(20) NOT NULL CHECK (action_type = 'ACTUATOR_COMMAND'),
     target VARCHAR(100) NOT NULL,
     payload VARCHAR(100) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -23,5 +23,3 @@ CREATE TABLE automation_rules (
 -- Esempio di regola iniziale coerente con le US
 INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
 VALUES ('rule_001', 'Raffreddamento Serra', 'greenhouse_temperature', 'value', '>', '2', 'ACTUATOR_COMMAND', 'cooling_fan', 'ON');
-INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
-VALUES ('rule_002', 'Raffreddamento Serra', 'greenhouse_temperature', 'value', '>', '5', 'UI_ALERT', 'habitat_heater', 'ON');

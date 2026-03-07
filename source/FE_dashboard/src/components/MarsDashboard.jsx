@@ -9,18 +9,59 @@ import Spy from './Spy';
 
 import { useMarsData } from '../services/useMarsData';
 
+const ALERT_TARGETS = {
+  greenhousePh: 'greenhouse_ph_warning',
+  airlockCycles: 'airlock_cycles_warning',
+};
+
+const getRuleObservedValue = (rule, sensorData) => {
+  if (rule.source_name === 'hydroponic_ph' && rule.metric_key === 'ph') {
+    return sensorData.ph;
+  }
+
+  if (rule.source_name === 'mars/telemetry/airlock' && rule.metric_key === 'cycles_per_hour') {
+    return sensorData.airlock_cycles;
+  }
+
+  return null;
+};
+
+const evaluateRule = (value, operator, threshold) => {
+  const numericValue = Number(value);
+  const numericThreshold = Number(threshold);
+
+  if (!Number.isNaN(numericValue) && !Number.isNaN(numericThreshold)) {
+    if (operator === '>') return numericValue > numericThreshold;
+    if (operator === '>=') return numericValue >= numericThreshold;
+    if (operator === '<') return numericValue < numericThreshold;
+    if (operator === '<=') return numericValue <= numericThreshold;
+    if (operator === '=') return numericValue === numericThreshold;
+  }
+
+  if (operator === '=') {
+    return String(value) === String(threshold);
+  }
+
+  return false;
+};
+
 const MarsDashboard = () => {
   const [isAuto, setIsAuto] = useState(true);
-
-  const [actuators, setActuators] = useState({
-    coolingFan: false,
-    habitatHeater: false,
-    entranceHumidifier: false,
-    hallVentilation: false,
-  });
   const [manualError, setManualError] = useState('');
 
-  const { sensorData, rules, history, sendActuatorCommand } = useMarsData();
+  const { sensorData, rules, history, actuators, sendActuatorCommand } = useMarsData();
+
+  const activeAlerts = rules
+    .filter((rule) => rule.action_type === 'UI_ALERT' && rule.is_active)
+    .reduce((acc, rule) => {
+      const observedValue = getRuleObservedValue(rule, sensorData);
+      if (observedValue === null || observedValue === undefined) {
+        return acc;
+      }
+
+      acc[rule.target] = evaluateRule(observedValue, rule.operator, rule.threshold);
+      return acc;
+    }, {});
 
   const actuatorMap = {
     coolingFan: 'cooling_fan',
@@ -37,7 +78,6 @@ const MarsDashboard = () => {
       try {
         setManualError('');
         await sendActuatorCommand(actuatorName, nextValue ? 'ON' : 'OFF');
-        setActuators((prev) => ({ ...prev, [name]: nextValue }));
       } catch (error) {
         console.error('Errore manual override:', error);
         setManualError('Manual override non riuscito');
@@ -64,7 +104,7 @@ const MarsDashboard = () => {
               <div className="flex flex-col justify-start items-end align-center w-full">
                 <div className="flex items-baseline justify-between gap-2 w-full">
                   <span className="text-xs font-bold text-gray-800 uppercase tracking-widest mt-auto ml-2">PH</span>
-                  <WarningLight isOn={sensorData.ph < 5.5 || sensorData.ph > 7.5} isBlinking={true} text="!" activeColor="bg-yellow-400" />
+                  <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.greenhousePh])} isBlinking={true} text="!" activeColor="bg-yellow-400" />
                 </div>
                 <div className="flex flex-row justify-end content-center gap-4 w-full">
                   <HorizontalBarGauge value={sensorData.ph} min={0} max={14} tickCount={7} label="" fillColor="bg-green-500" emptyColor="bg-green-200" />
@@ -108,7 +148,7 @@ const MarsDashboard = () => {
              </div>
               <div className="flex flex-col justify-start items-end align-center w-full">
                 <div className="flex items-baseline justify-between gap-2 w-full">
-                  <WarningLight isOn={sensorData.airlock_cycles > 15} text="!" activeColor="bg-yellow-400" />
+                  <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.airlockCycles])} text="!" activeColor="bg-yellow-400" />
                 </div>
                 <div className="flex flex-row justify-end content-center gap-4 w-full">
                     <HorizontalBarGauge value={sensorData.airlock_cycles} min={0} max={20} label="cycles" fillColor="bg-blue-600" emptyColor="bg-blue-200" />

@@ -25,11 +25,18 @@ def get_db_connection():
     return psycopg2.connect(**DB_CONFIG)
 
 def fetch_rules():
-    """Recupera solo le regole attive dal DB in ordine stabile."""
+    """Recupera solo le regole attive per attuatori dal DB in ordine stabile."""
     try:
         conn = get_db_connection()
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT * FROM automation_rules WHERE is_active = TRUE ORDER BY created_at ASC, id ASC;")
+            cur.execute(
+                """
+                SELECT *
+                FROM automation_rules
+                WHERE is_active = TRUE AND action_type = 'ACTUATOR_COMMAND'
+                ORDER BY created_at ASC, id ASC;
+                """
+            )
             return cur.fetchall()
     except Exception as e:
         print(f"[PROCESSOR] Errore DB: {e}")
@@ -120,11 +127,8 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
                 if current_value is not None:
                     condition_met = evaluate_condition(current_value, rule['operator'], rule['threshold'])
                     if should_emit_trigger(rule['rule_id'], condition_met):
-                        if rule['action_type'] == 'ACTUATOR_COMMAND':
-                            await trigger_actuator(rule['target'], rule['payload'])
-                            print(f"[RULE TRIGGERED] {rule['rule_id']}: {rule['target']} -> {rule['payload']}")
-                        elif rule['action_type'] == 'UI_ALERT':
-                            print(f"[UI ALERT] {rule['payload']}")
+                        await trigger_actuator(rule['target'], rule['payload'])
+                        print(f"[RULE TRIGGERED] {rule['rule_id']}: {rule['target']} -> {rule['payload']}")
                         await publish_rule_history(exchange, rule, current_value)
 
 async def main():

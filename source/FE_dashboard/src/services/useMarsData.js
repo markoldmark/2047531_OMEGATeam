@@ -1,23 +1,31 @@
 import { useState, useEffect, useRef } from 'react';
 
 const API_URL = 'http://127.0.0.1:8000';
+const INITIAL_ACTUATOR_STATE = {
+  coolingFan: false,
+  habitatHeater: false,
+  entranceHumidifier: false,
+  hallVentilation: false,
+};
 
 // --- 1. CHIAMATE API (REST) ---
 
 export const fetchRulesAndHistory = async () => {
   try {
-    const [rulesRes, historyRes] = await Promise.all([
+    const [rulesRes, historyRes, actuatorsRes] = await Promise.all([
       fetch(`${API_URL}/api/rules`),
-      fetch(`${API_URL}/api/history`)
+      fetch(`${API_URL}/api/history`),
+      fetch(`${API_URL}/api/actuators`)
     ]);
     
     const rules = rulesRes.ok ? await rulesRes.json() : [];
     const history = historyRes.ok ? await historyRes.json() : [];
+    const actuators = actuatorsRes.ok ? await actuatorsRes.json() : { actuators: {} };
     
-    return { rules, history };
+    return { rules, history, actuators };
   } catch (error) {
     console.error('Errore caricamento rules/history:', error);
-    return { rules: [], history: [] };
+    return { rules: [], history: [], actuators: { actuators: {} } };
   }
 };
 
@@ -50,6 +58,16 @@ const getMetric = (arr, metricStr) => {
   if (!arr || !Array.isArray(arr)) return null;
   const item = arr.find(m => m.metric && m.metric.toLowerCase().includes(metricStr));
   return item ? item.value : null;
+};
+
+const mapActuatorStates = (payload) => {
+  const actuators = payload?.actuators ?? {};
+  return {
+    coolingFan: actuators.cooling_fan === 'ON',
+    habitatHeater: actuators.habitat_heater === 'ON',
+    entranceHumidifier: actuators.entrance_humidifier === 'ON',
+    hallVentilation: actuators.hall_ventilation === 'ON',
+  };
 };
 
 // Parser per l'evento 'INIT_STATE'
@@ -140,13 +158,29 @@ export const useMarsData = () => {
   const [sensorData, setSensorData] = useState(INITIAL_SENSOR_STATE);
   const [rules, setRules] = useState([]);
   const [history, setHistory] = useState([]);
+  const [actuators, setActuators] = useState(INITIAL_ACTUATOR_STATE);
 
   const socketRef = useRef(null);
 
   const loadData = async () => {
     const data = await fetchRulesAndHistory();
-    if (data.rules.length) setRules(data.rules);
-    if (data.history.length) setHistory(data.history);
+    setRules(data.rules);
+    setHistory(data.history);
+    setActuators(mapActuatorStates(data.actuators));
+  };
+
+  const handleSendActuatorCommand = async (actuatorName, state) => {
+    const response = await sendActuatorCommand(actuatorName, state);
+
+    setActuators((prev) => ({
+      ...prev,
+      coolingFan: actuatorName === 'cooling_fan' ? state === 'ON' : prev.coolingFan,
+      habitatHeater: actuatorName === 'habitat_heater' ? state === 'ON' : prev.habitatHeater,
+      entranceHumidifier: actuatorName === 'entrance_humidifier' ? state === 'ON' : prev.entranceHumidifier,
+      hallVentilation: actuatorName === 'hall_ventilation' ? state === 'ON' : prev.hallVentilation,
+    }));
+
+    return response;
   };
 
   useEffect(() => {
@@ -196,5 +230,5 @@ export const useMarsData = () => {
     };
   }, []);
 
-  return { sensorData, rules, history, sendActuatorCommand };
+  return { sensorData, rules, history, actuators, sendActuatorCommand: handleSendActuatorCommand };
 };

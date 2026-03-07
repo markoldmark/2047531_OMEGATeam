@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+from datetime import datetime, timezone
 from urllib import error, request
 
 import aio_pika
@@ -30,9 +31,47 @@ DB_CONFIG = {
     "host": "db"
 }
 
+
+def build_default_alert_rules():
+    """Inizializza le regole alert non persistenti gestite dal presentation."""
+    timestamp = datetime.now(timezone.utc).isoformat()
+    return [
+        {
+            "id": None,
+            "rule_id": "ALLARME PH SERRA",
+            "is_active": True,
+            "source_name": "hydroponic_ph",
+            "metric_key": "ph",
+            "operator": ">",
+            "threshold": "9",
+            "action_type": "UI_ALERT",
+            "target": "greenhouse_ph_warning",
+            "payload": "ON",
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        },
+        {
+            "id": None,
+            "rule_id": "ALLARME CICLI AIRLOCK",
+            "is_active": True,
+            "source_name": "mars/telemetry/airlock",
+            "metric_key": "cycles_per_hour",
+            "operator": ">",
+            "threshold": "10",
+            "action_type": "UI_ALERT",
+            "target": "airlock_cycles_warning",
+            "payload": "ON",
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        }
+    ]
+
+
 latest_state_cache = {}
 active_connections = set()
 rule_history_cache = []
+alert_rules_cache = build_default_alert_rules()
+alert_rule_activation_state = {}
 
 
 # Modello per la validazione delle regole in ingresso
@@ -62,6 +101,102 @@ def get_db_connection():
     return psycopg2.connect(**DB_CONFIG)
 
 
+def append_rule_history(event_payload: dict):
+    """Aggiunge un trigger alla history volatile mantenendo il limite massimo."""
+    rule_history_cache.insert(0, event_payload)
+    del rule_history_cache[MAX_RULE_HISTORY:]
+
+
+def find_alert_rule(rule_id: str):
+    """Recupera una regola alert volatile tramite il suo identificativo."""
+    for rule in alert_rules_cache:
+        if rule["rule_id"] == rule_id:
+            return rule
+    return None
+
+
+def evaluate_condition(value, operator, threshold):
+    """Valuta la condizione di una regola su valori numerici o testuali."""
+    try:
+        val = float(value)
+        thr = float(threshold)
+        if operator == ">":
+            return val > thr
+        if operator == ">=":
+            return val >= thr
+        if operator == "<":
+            return val < thr
+        if operator == "<=":
+            return val <= thr
+        if operator == "=":
+            return val == thr
+    except (ValueError, TypeError):
+        if operator == "=":
+            return str(value) == str(threshold)
+    return False
+
+
+def extract_metric_value(measurements, metric_key):
+    """Estrae dinamicamente il valore della metrica dal payload normalizzato."""
+    if metric_key in measurements:
+        return measurements.get(metric_key)
+
+    nested_measurements = measurements.get("measurements")
+    if isinstance(nested_measurements, list):
+        for item in nested_measurements:
+            metric_name = str(item.get("metric", "")).lower()
+            if metric_key.lower() in metric_name:
+                return item.get("value")
+
+    return None
+
+
+def should_emit_alert(rule_id, condition_met):
+    """Emette un alert solo sul fronte di attivazione della regola."""
+    was_active = alert_rule_activation_state.get(rule_id, False)
+    alert_rule_activation_state[rule_id] = condition_met
+    return condition_met and not was_active
+
+
+def build_alert_trigger(rule: dict, observed_value):
+    """Costruisce un evento di history per una regola alert volatile."""
+    return {
+        "event_type": "RULE_TRIGGER",
+        "id": f"alert-{datetime.now(timezone.utc).timestamp()}",
+        "rule_id": rule["rule_id"],
+        "source_name": rule["source_name"],
+        "metric_key": rule["metric_key"],
+        "observed_value": str(observed_value),
+        "action_type": rule["action_type"],
+        "target": rule["target"],
+        "payload": rule["payload"],
+        "event_timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def process_alert_rules(event_payload: dict):
+    """Valuta le regole alert in memoria a partire dagli eventi in ingresso."""
+    source = event_payload.get("source_name")
+    measurements = event_payload.get("measurements", {})
+
+    if not source:
+        return
+
+    for rule in alert_rules_cache:
+        if not rule.get("is_active", True):
+            continue
+        if rule["source_name"] != source:
+            continue
+
+        current_value = extract_metric_value(measurements, rule["metric_key"])
+        if current_value is None:
+            continue
+
+        condition_met = evaluate_condition(current_value, rule["operator"], rule["threshold"])
+        if should_emit_alert(rule["rule_id"], condition_met):
+            append_rule_history(build_alert_trigger(rule, current_value))
+
+
 def send_actuator_command(actuator_name: str, state: str):
     """Invia un comando manuale al simulatore per aggiornare un attuatore."""
     payload = json.dumps({"state": state}).encode("utf-8")
@@ -82,6 +217,19 @@ def send_actuator_command(actuator_name: str, state: str):
     except error.URLError as exc:
         raise HTTPException(status_code=502, detail="Simulator unreachable") from exc
 
+
+def get_actuator_states():
+    """Recupera lo stato corrente degli attuatori dal simulatore."""
+    try:
+        with request.urlopen(f"{SIMULATOR_URL}/api/actuators", timeout=5) as response:
+            body = response.read().decode("utf-8")
+            return json.loads(body) if body else {"actuators": {}}
+    except error.HTTPError as exc:
+        detail = exc.read().decode("utf-8") or "Actuator state fetch failed"
+        raise HTTPException(status_code=exc.code, detail=detail) from exc
+    except error.URLError as exc:
+        raise HTTPException(status_code=502, detail="Simulator unreachable") from exc
+
 async def consume_rabbitmq():
     """Consuma eventi dal broker, aggiornando stato live e history volatile."""
     while True:
@@ -98,13 +246,13 @@ async def consume_rabbitmq():
                         async with message.process():
                             payload = json.loads(message.body.decode())
                             if payload.get("event_type") == "RULE_TRIGGER":
-                                rule_history_cache.insert(0, payload)
-                                del rule_history_cache[MAX_RULE_HISTORY:]
+                                append_rule_history(payload)
                                 continue
 
                             source = payload.get("source_name")
                             if source:
                                 latest_state_cache[source] = payload
+                                process_alert_rules(payload)
                             
                             if active_connections:
                                 await asyncio.gather(*[
@@ -125,20 +273,41 @@ async def get_state():
 
 @app.get("/api/rules")
 async def get_rules():
-    """Restituisce tutte le regole persistite ordinate per creazione."""
+    """Restituisce le regole persistite e gli alert gestiti in memoria."""
     conn = get_db_connection()
     try:
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute("SELECT * FROM automation_rules ORDER BY created_at ASC, id ASC")
         rules = cur.fetchall()
         cur.close()
-        return rules
+        return rules + alert_rules_cache
     finally:
         conn.close()
 
 @app.post("/api/rules")
 async def create_rule(rule: RuleSchema):
-    """Crea una nuova regola persistente nel database."""
+    """Crea una regola persistente o un alert volatile in base al tipo azione."""
+    if rule.action_type == "UI_ALERT":
+        timestamp = datetime.now(timezone.utc).isoformat()
+        created_rule = {
+            "id": None,
+            "rule_id": rule.rule_id,
+            "description": rule.description,
+            "is_active": rule.is_active,
+            "source_name": rule.source_name,
+            "metric_key": rule.metric_key,
+            "operator": rule.operator,
+            "threshold": rule.threshold,
+            "action_type": rule.action_type,
+            "target": rule.target,
+            "payload": rule.payload,
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        }
+        alert_rules_cache.append(created_rule)
+        alert_rule_activation_state[rule.rule_id] = False
+        return created_rule
+
     conn = get_db_connection()
     try:
         cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -174,7 +343,15 @@ async def create_rule(rule: RuleSchema):
 
 @app.patch("/api/rules/{rule_id}")
 async def update_rule(rule_id: str, update: RuleStatusUpdate):
-    """Attiva o disattiva una regola esistente."""
+    """Attiva o disattiva una regola persistita o un alert volatile."""
+    alert_rule = find_alert_rule(rule_id)
+    if alert_rule:
+        alert_rule["is_active"] = update.is_active
+        alert_rule["updated_at"] = datetime.now(timezone.utc).isoformat()
+        if not update.is_active:
+            alert_rule_activation_state[rule_id] = False
+        return alert_rule
+
     conn = get_db_connection()
     try:
         cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -203,6 +380,12 @@ async def update_rule(rule_id: str, update: RuleStatusUpdate):
 async def get_history(limit: int = Query(default=50, ge=1, le=500)):
     """Restituisce la history dei trigger mantenuta solo in memoria."""
     return rule_history_cache[:limit]
+
+
+@app.get("/api/actuators")
+async def get_actuators():
+    """Restituisce lo stato corrente degli attuatori dal simulatore."""
+    return get_actuator_states()
 
 
 @app.post("/api/actuators/{actuator_name}")
