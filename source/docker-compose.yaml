@@ -1,5 +1,16 @@
+  # frontend:
+  #   build: 
+  #     context: ./FE_dashboard
+  #     dockerfile: Dockerfile
+  #   container_name: FE_dashboard
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - db
+  #     - simulator
+  #   restart: unless-stopped
+
 services:
-  # --- SIMULATORE MARZIANO (Fornito) ---
   simulator:
     image: mars-iot-simulator:multiarch_v1
     container_name: mars_simulator
@@ -7,7 +18,6 @@ services:
       - "8080:8080"
     restart: unless-stopped
 
-  # --- SERVIZIO DATABASE ---
   db:
     image: postgres:15-alpine
     container_name: DB_history
@@ -21,36 +31,66 @@ services:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
 
-  # # --- SERVIZIO FRONTEND ---
-  # frontend:
-  #   build: 
-  #     context: ./FE_dashboard
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: mars_broker
+    ports:
+      - "5672:5672"   # Porta di comunicazione per i microservizi
+      - "15672:15672" # Porta per la dashboard visiva di RabbitMQ (Aprila nel browser!)
+    restart: unless-stopped
+
+  be_ingestion:
+    build: 
+      context: ./BE_data-ingestion
+      dockerfile: Dockerfile
+    container_name: BE_data-ingestion
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - SIMULATOR_URL=http://simulator:8080                 
+      - SIMULATOR_WS_URL=ws://simulator:8080/api/telemetry/ws
+    depends_on:
+      - simulator
+      - rabbitmq
+    restart: unless-stopped
+
+  # be_processing:
+  #   build:
+  #     context: ./source/BE_processing
   #     dockerfile: Dockerfile
-  #   container_name: FE_dashboard
-  #   ports:
-  #     - "3000:80"
+  #   container_name: BE_processing
   #   depends_on:
+  #     - rabbitmq
   #     - db
-  #     - simulator
   #   restart: unless-stopped
 
-  # --- SERVIZIO FRONTEND (Modalità Sviluppo) ---
+  be_presentation:
+    build: 
+      context: ./BE_presentation
+      dockerfile: Dockerfile
+    container_name: BE_presentation
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    ports:
+      - "8000:8000" # Porta esposta per far collegare il frontend
+    depends_on:
+      - rabbitmq
+      - db
+    restart: unless-stopped
+
   frontend:
     build: 
       context: ./FE_dashboard
-      dockerfile: Dockerfile.dev # <--- Puntiamo al nuovo file
+      dockerfile: Dockerfile.dev 
     container_name: FE_dashboard
     ports:
-      - "5173:5173" # <--- Cambia in 3000:3000 se usi Create React App
+      - "5173:5173" 
     volumes:
-      # Questo volume "sincronizza" la tua cartella locale con quella del container
       - ./FE_dashboard:/app
-      # Questo trucco evita che la tua cartella node_modules locale sovrascriva quella del container
       - /app/node_modules
     environment:
-      # Forza l'aggiornamento dei file, super utile se sviluppi da Windows/WSL
       - CHOKIDAR_USEPOLLING=true 
     depends_on:
       - db
       - simulator
+      - be_presentation
     restart: unless-stopped

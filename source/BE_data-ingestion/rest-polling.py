@@ -1,73 +1,75 @@
 import time
 import uuid
 import requests
+import json
+import pika
+import os
 from datetime import datetime, timezone
 
-# Configurazione di base del simulatore
-SIMULATOR_BASE_URL = "http://localhost:8080"
-POLLING_INTERVAL = 5 # Secondi tra una lettura e l'altra
+SIMULATOR_BASE_URL = os.getenv("SIMULATOR_URL", "http://localhost:8080")
+RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
+POLLING_INTERVAL = 5 
 
-# Lista dei sensori REST da interrogare, presi dalla documentazione
 REST_SENSORS = [
-    "greenhouse_temperature",
-    "entrance_humidity",
-    "co2_hall",
-    "hydroponic_ph",
-    "water_tank_level",
-    "corridor_pressure",
-    "air_quality_pm25",
-    "air_quality_voc"
+    "greenhouse_temperature", "entrance_humidity", "co2_hall",
+    "hydroponic_ph", "water_tank_level", "corridor_pressure",
+    "air_quality_pm25", "air_quality_voc"
 ]
 
+def get_rabbitmq_channel():
+    """Crea la connessione a RabbitMQ e dichiara l'exchange."""
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
+    channel = connection.channel()
+    # Usiamo un exchange di tipo 'fanout' (invia a tutte le code collegate)
+    channel.exchange_declare(exchange='mars_events', exchange_type='fanout')
+    return connection, channel
+
 def fetch_sensor_data(sensor_id):
-    """Esegue il polling del sensore REST."""
     url = f"{SIMULATOR_BASE_URL}/api/sensors/{sensor_id}"
     try:
         response = requests.get(url, timeout=3)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"Errore durante il polling di {sensor_id}: {e}")
+        print(f"[REST] Errore polling {sensor_id}: {e}")
         return None
 
 def normalize_event(sensor_id, raw_data):
-    """
-    Converte il payload grezzo nel tuo Standard Event Schema.
-    """
-    # Creiamo il timestamp in formato ISO 8601
-    current_time = datetime.now(timezone.utc).isoformat()
-    
-    # Costruiamo l'evento rispettando rigorosamente il tuo schema
-    event = {
+    return {
         "event_id": str(uuid.uuid4()),
-        "timestamp": current_time,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "source_type": "REST",
         "source_name": sensor_id,
-        "measurements": raw_data, # Passiamo l'oggetto JSON restituito dal sensore
-        "status": "ok" # Default, eventualmente aggiornabile in base a logiche specifiche
+        "measurements": raw_data,
+        "status": "ok"
     }
-    return event
-
-def publish_to_broker(event):
-    """
-    Funzione mock per l'invio al message broker.
-    Qui inserirai la logica di Kafka (confluent-kafka) o ActiveMQ/RabbitMQ (pika).
-    """
-    # TODO: Implementare la connessione e la pubblicazione sul broker
-    print(f"-> Pubblicato evento sul broker: {event['source_name']}")
-    # print(json.dumps(event, indent=2))
 
 def start_polling():
-    """Loop principale di ingestion REST."""
-    print("Inizio polling dei sensori REST...")
+    print(f"Avvio REST Poller. Connessione a RabbitMQ su {RABBITMQ_HOST}...")
+    
+    # Riprova a connettersi a RabbitMQ finché non è pronto (utile all'avvio di Docker)
+    while True:
+        try:
+            connection, channel = get_rabbitmq_channel()
+            print("Connesso a RabbitMQ con successo!")
+            break
+        except pika.exceptions.AMQPConnectionError:
+            print("RabbitMQ non ancora pronto. Riprovo in 3 secondi...")
+            time.sleep(3)
+
     while True:
         for sensor in REST_SENSORS:
             raw_data = fetch_sensor_data(sensor)
             if raw_data:
-                normalized_event = normalize_event(sensor, raw_data)
-                publish_to_broker(normalized_event)
+                event = normalize_event(sensor, raw_data)
+                # Pubblichiamo l'evento sull'exchange
+                channel.basic_publish(
+                    exchange='mars_events',
+                    routing_key='', # Non serve con 'fanout'
+                    body=json.dumps(event)
+                )
+                print(f"[REST] -> Inviato a RabbitMQ: {sensor}")
         
-        # Pausa prima del prossimo ciclo di polling
         time.sleep(POLLING_INTERVAL)
 
 if __name__ == "__main__":

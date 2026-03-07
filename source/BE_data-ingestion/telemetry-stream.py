@@ -2,79 +2,74 @@ import asyncio
 import websockets
 import json
 import uuid
+import os
+import aio_pika
 from datetime import datetime, timezone
 
-# Configurazione del simulatore per i WebSocket
-SIMULATOR_WS_URL = "ws://localhost:8080/api/telemetry/ws"
+SIMULATOR_WS_URL = os.getenv("SIMULATOR_WS_URL", "ws://localhost:8080/api/telemetry/ws")
+RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
 
-# Lista dei topic di telemetria presi dal briefing
 TELEMETRY_TOPICS = [
-    "mars/telemetry/solar_array",
-    "mars/telemetry/radiation",
-    "mars/telemetry/life_support",
-    "mars/telemetry/thermal_loop",
-    "mars/telemetry/power_bus",
-    "mars/telemetry/power_consumption",
+    "mars/telemetry/solar_array", "mars/telemetry/radiation",
+    "mars/telemetry/life_support", "mars/telemetry/thermal_loop",
+    "mars/telemetry/power_bus", "mars/telemetry/power_consumption",
     "mars/telemetry/airlock"
-] #
+]
 
 def normalize_event(topic, raw_data):
-    """
-    Converte il payload della telemetria nel tuo Standard Event Schema.
-    """
-    current_time = datetime.now(timezone.utc).isoformat()
-    
-    event = {
+    return {
         "event_id": str(uuid.uuid4()),
-        "timestamp": current_time,
-        "source_type": "TELEMETRY", # Identifica che arriva da un flusso pub/sub
-        "source_name": topic,       # Usiamo il nome del topic come source_name
-        "measurements": raw_data,   # I dati grezzi diventano le nostre misurazioni
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "source_type": "TELEMETRY",
+        "source_name": topic,
+        "measurements": raw_data,
         "status": "ok"
     }
-    return event
 
-def publish_to_broker(event):
-    """
-    Funzione mock per l'invio al message broker (Kafka/RabbitMQ).
-    """
-    # TODO: Implementare il client del message broker
-    print(f"[TELEMETRY] -> Pubblicato evento sul broker da: {event['source_name']}")
-    # print(json.dumps(event, indent=2))
+async def get_rabbitmq_exchange():
+    """Connessione asincrona a RabbitMQ."""
+    while True:
+        try:
+            connection = await aio_pika.connect_robust(f"amqp://guest:guest@{RABBITMQ_HOST}/")
+            channel = await connection.channel()
+            exchange = await channel.declare_exchange('mars_events', aio_pika.ExchangeType.FANOUT)
+            print("Connesso a RabbitMQ con successo!")
+            return exchange
+        except Exception as e:
+            print(f"RabbitMQ non pronto. Riprovo in 3 secondi... Errore: {e}")
+            await asyncio.sleep(3)
 
-async def listen_to_topic(topic):
-    """
-    Si connette a un singolo topic tramite WebSocket e ascolta all'infinito.
-    """
+async def listen_to_topic(topic, exchange):
     url = f"{SIMULATOR_WS_URL}?topic={topic}"
     
     while True:
         try:
             async with websockets.connect(url) as websocket:
-                print(f"Connesso al topic: {topic}")
+                print(f"[WS] Connesso al topic: {topic}")
                 async for message in websocket:
                     raw_data = json.loads(message)
-                    normalized_event = normalize_event(topic, raw_data)
-                    publish_to_broker(normalized_event)
+                    event = normalize_event(topic, raw_data)
+                    
+                    # Pubblica il messaggio asincronamente
+                    await exchange.publish(
+                        aio_pika.Message(body=json.dumps(event).encode()),
+                        routing_key=""
+                    )
+                    print(f"[TELEMETRY] -> Inviato a RabbitMQ: {topic}")
                     
         except websockets.exceptions.ConnectionClosed:
-            print(f"Connessione persa per {topic}. Riconnessione in corso...")
+            print(f"Connessione persa per {topic}. Riconnessione...")
             await asyncio.sleep(5)
         except Exception as e:
-            print(f"Errore sul topic {topic}: {e}")
+            print(f"Errore su {topic}: {e}")
             await asyncio.sleep(5)
 
 async def main():
-    """
-    Avvia contemporaneamente l'ascolto su tutti i topic di telemetria.
-    """
-    print("Inizio ascolto flussi di telemetria...")
-    # Crea un task asincrono per ogni topic
-    tasks = [listen_to_topic(topic) for topic in TELEMETRY_TOPICS]
+    print(f"Avvio Telemetry Streamer. Connessione a RabbitMQ su {RABBITMQ_HOST}...")
+    exchange = await get_rabbitmq_exchange()
     
-    # Esegue tutti i task in parallelo
+    tasks = [listen_to_topic(topic, exchange) for topic in TELEMETRY_TOPICS]
     await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
-    # Avvia l'event loop di asyncio
     asyncio.run(main())
