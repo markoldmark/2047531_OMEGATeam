@@ -28,12 +28,17 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./DB_history/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: mars_broker
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5672:5672"   # Porta di comunicazione per i microservizi
       - "15672:15672" # Porta per la dashboard visiva di RabbitMQ (Aprila nel browser!)
@@ -53,15 +58,22 @@ services:
       - rabbitmq
     restart: unless-stopped
 
-  # be_processing:
-  #   build:
-  #     context: ./source/BE_processing
-  #     dockerfile: Dockerfile
-  #   container_name: BE_processing
-  #   depends_on:
-  #     - rabbitmq
-  #     - db
-  #   restart: unless-stopped
+  be_processing:
+    build:
+      context: ./BE_processing
+      dockerfile: Dockerfile
+    container_name: BE_processing
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - SIMULATOR_URL=http://simulator:8080
+      - PYTHONUNBUFFERED=1
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_started
+    restart: unless-stopped
 
   be_presentation:
     build: 
@@ -92,7 +104,6 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true 
     depends_on:
-      - db
       - simulator
       - be_presentation
     restart: unless-stopped
