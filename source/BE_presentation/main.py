@@ -375,6 +375,21 @@ async def update_rule(rule_id: str, update: RuleStatusUpdate):
 
     return updated_rule
 
+@app.delete("/api/rules/{rule_id}")
+async def delete_rule(rule_id: str):
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM automation_rules WHERE rule_id = %s", (rule_id,))
+        deleted = cur.rowcount
+        conn.commit()
+        cur.close()
+        if deleted == 0:
+            raise HTTPException(status_code=404, detail="Rule not found")
+        return {"status": "success", "deleted_id": rule_id}
+    finally:
+        conn.close()
+        
 
 @app.get("/api/history")
 async def get_history(limit: int = Query(default=50, ge=1, le=500)):
