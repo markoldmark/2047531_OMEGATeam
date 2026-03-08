@@ -139,7 +139,7 @@ const MarsDashboard = () => {
             
             <div className="flex justify-between items-stretch flex-grow h-full gap-2">
               
-              <div className="flex-1 flex flex-col items-center justify-start pt-2 h-full">
+              <div className="flex-1 flex flex-col items-center justify-start h-full">
                 <OdometerGauge value={sensorData.co2} min={0} max={2000} scale={1.15} label="co2" needleColor="bg-rose-500" />
               </div>
               
@@ -150,7 +150,7 @@ const MarsDashboard = () => {
               
               <div className="flex-1 flex justify-center items-center gap-6 h-full">
                 <VerticalBarGauge value={sensorData.pm25} min={0} max={100} label="pm25" unit="" fillColor="from-rose-500 to-pink-500" tickCount={5} />
-                <VerticalBarGauge value={sensorData.humidity} min={0} max={100} label="hum" unit="%" fillColor="from-slate-300 to-white" tickCount={5} />
+                <VerticalBarGauge value={sensorData.humidity} min={0} max={100} label="hum" unit="%" fillColor="from-cyan-100 to-cyan-400" tickCount={5} />
               </div>
               
             </div>
@@ -177,7 +177,7 @@ const MarsDashboard = () => {
                   label="radiation" 
                   needleColor="bg-cyan-400" 
                   ticks={[0.25, 0.5, 0.75]} 
-                  scale={1.35} 
+                  scale={1.15} 
                 />
               </div>
               
