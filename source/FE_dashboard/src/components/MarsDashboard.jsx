@@ -167,7 +167,7 @@ const MarsDashboard = () => {
             
             <div className="text-center text-cyan-400 font-bold text-lg tracking-[0.2em] uppercase mb-2">Airlock</div>
             
-            <div className="grid grid-cols-2 gap-6 flex-grow items-start pt-2">
+            <div className="grid grid-cols-1 gap-6 flex-grow items-start pt-2">
               
               <div className="flex flex-col items-center justify-start">
                 <OdometerGauge 
