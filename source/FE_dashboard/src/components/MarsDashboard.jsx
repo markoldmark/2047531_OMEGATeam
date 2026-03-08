@@ -320,7 +320,7 @@ const MarsDashboard = () => {
           )}
         </div>
 
-        <aside className="bg-slate-950/78 backdrop-blur-md rounded-[40px] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.58)] border border-slate-600/70 ring-1 ring-white/5 flex flex-col self-start h-[760px] max-h-[calc(100vh-4rem)] overflow-hidden">
+        <aside className="bg-slate-950/88 rounded-[40px] p-5 shadow-2xl border border-slate-700/80 ring-1 ring-white/5 flex flex-col self-start h-[760px] max-h-[calc(100vh-4rem)] overflow-hidden">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <div className="text-white font-black text-lg tracking-[0.2em] uppercase">Action History</div>
@@ -331,12 +331,12 @@ const MarsDashboard = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 overflow-y-auto pr-2 flex-1 min-h-0">
+          <div className="flex flex-col gap-2 overflow-y-auto pr-2 flex-1 min-h-0 overscroll-contain [contain:content]">
             {history.length === 0 && (
               <div className="text-sm text-slate-400 font-semibold italic">No trigger history yet</div>
             )}
             {history.map((item) => (
-              <div key={item.id} className="rounded-xl p-4 border border-slate-600 bg-slate-900/90">
+              <div key={item.id} className="rounded-xl p-3 border border-slate-700 bg-slate-900">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex flex-wrap items-center gap-2 min-w-0">
                     <span className={`text-[10px] font-black px-2 py-1 rounded-full tracking-widest uppercase ${
@@ -352,8 +352,8 @@ const MarsDashboard = () => {
                   </div>
                 </div>
 
-                <div className="grid gap-2 text-sm">
-                  <div className="rounded-lg bg-slate-800/70 px-3 py-2">
+                <div className="grid gap-2 text-sm [contain:content]">
+                  <div className="rounded-lg bg-slate-800 px-3 py-2">
                     <div className="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Trigger</div>
                     <div className="text-slate-100 font-semibold break-words">
                       {item.source_name}
@@ -362,7 +362,7 @@ const MarsDashboard = () => {
                     </div>
                   </div>
 
-                  <div className="rounded-lg bg-slate-800/70 px-3 py-2">
+                  <div className="rounded-lg bg-slate-800 px-3 py-2">
                     <div className="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Action</div>
                     <div className={`font-black break-words ${
                       item.action_type === 'UI_ALERT' ? 'text-amber-300' : 'text-emerald-300'
