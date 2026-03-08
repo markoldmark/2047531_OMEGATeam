@@ -1,10 +1,30 @@
 import React, { useState } from 'react';
 
-const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule }) => {
+const PauseIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor" aria-hidden="true">
+    <rect x="6" y="5" width="4" height="14" rx="1.2" />
+    <rect x="14" y="5" width="4" height="14" rx="1.2" />
+  </svg>
+);
+
+const ResumeIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor" aria-hidden="true">
+    <path d="M8 5.5v13l10-6.5-10-6.5z" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4 20l4.5-1 9-9a2.1 2.1 0 0 0-3-3l-9 9L4 20z" />
+    <path d="M13.5 6.5l4 4" />
+  </svg>
+);
+
+const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggleRule }) => {
   const [activeTab, setActiveTab] = useState('list'); 
   const [editingId, setEditingId] = useState(null);
 
-  const defaultRule = { sensor: 'greenhouse_temperature', operator: '>', value: '', actuator: 'cooling_fan', action: 'ON' };
+  const defaultRule = { sensor: 'greenhouse_temperature', operator: '>', value: '', actuator: 'cooling_fan', action: 'ON', isActive: true };
   const [ruleForm, setRuleForm] = useState(defaultRule);
 
   // ... (sensors e actuators arrays rimangono uguali a prima) ...
@@ -37,7 +57,7 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule }) => {
 
         {/* TABS */}
         <div className="flex gap-4 mb-6 border-b border-white/10 pb-4">
-          <button onClick={() => setActiveTab('list')} className={`px-4 py-2 rounded-lg font-semibold text-xs uppercase tracking-widest transition-all ${activeTab === 'list' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50' : 'text-slate-500 hover:text-slate-300'}`}>Active Rules</button>
+          <button onClick={() => setActiveTab('list')} className={`px-4 py-2 rounded-lg font-semibold text-xs uppercase tracking-widest transition-all ${activeTab === 'list' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50' : 'text-slate-500 hover:text-slate-300'}`}>Rules</button>
           <button onClick={() => {setRuleForm(defaultRule); setEditingId(null); setActiveTab('form');}} className={`px-4 py-2 rounded-lg font-semibold text-xs uppercase tracking-widest transition-all ${activeTab === 'form' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50' : 'text-slate-500 hover:text-slate-300'}`}>
             {editingId ? 'Edit Rule' : 'New Rule'}
           </button>
@@ -55,6 +75,15 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule }) => {
                   <div key={r.id} className="bg-slate-800/50 p-4 rounded-2xl border border-white/5 flex justify-between items-center hover:border-cyan-500/30 transition-colors">
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest ${
+                          r.isActive
+                            ? 'bg-emerald-500/20 text-emerald-400'
+                            : 'bg-slate-700 text-slate-300'
+                        }`}>
+                          {r.isActive ? 'ACTIVE' : 'INACTIVE'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold text-slate-500 uppercase">IF</span>
                         <span className="text-sm text-cyan-300 font-mono bg-slate-900 px-2 py-1 rounded">{getSensorLabel(r.sensor)}</span>
                         <span className="text-emerald-400 font-bold">{r.operator}</span>
@@ -69,7 +98,17 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule }) => {
                     </div>
                     
                     <div className="flex gap-2 ml-4">
-                      <button onClick={() => {setRuleForm(r); setEditingId(r.id); setActiveTab('form');}} className="p-2 text-slate-400 hover:text-cyan-400 bg-slate-900 rounded-lg border border-white/5 hover:border-cyan-500/50 transition-all">✏️</button>
+                      <button
+                        onClick={() => onToggleRule(r.id, !r.isActive)}
+                        className={`p-2 rounded-lg border transition-all flex items-center justify-center ${
+                          r.isActive
+                            ? 'text-amber-300 bg-slate-900 border-amber-500/40 hover:border-amber-400'
+                            : 'text-emerald-300 bg-slate-900 border-emerald-500/40 hover:border-emerald-400'
+                        }`}
+                      >
+                        {r.isActive ? <PauseIcon /> : <ResumeIcon />}
+                      </button>
+                      <button onClick={() => {setRuleForm(r); setEditingId(r.id); setActiveTab('form');}} className="p-2 text-slate-400 hover:text-cyan-400 bg-slate-900 rounded-lg border border-white/5 hover:border-cyan-500/50 transition-all flex items-center justify-center"><EditIcon /></button>
                       <button onClick={() => onDeleteRule(r.id)} className="p-2 text-slate-400 hover:text-rose-400 bg-slate-900 rounded-lg border border-white/5 hover:border-rose-500/50 transition-all">🗑️</button>
                     </div>
                   </div>
