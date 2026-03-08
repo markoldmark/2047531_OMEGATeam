@@ -128,11 +128,15 @@ def evaluate_condition(value, operator, threshold):
             return val < thr
         if operator == "<=":
             return val <= thr
-        if operator == "=":
+        if operator in {"=", "=="}:
             return val == thr
+        if operator == "!=":
+            return val != thr
     except (ValueError, TypeError):
-        if operator == "=":
+        if operator in {"=", "=="}:
             return str(value) == str(threshold)
+        if operator == "!=":
+            return str(value) != str(threshold)
     return False
 
 
