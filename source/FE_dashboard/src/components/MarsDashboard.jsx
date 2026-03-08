@@ -217,7 +217,7 @@ const MarsDashboard = () => {
             
             <div className="flex justify-between items-center flex-grow gap-2 h-full px-2">
               
-              <div className="flex flex-col items-center justify-center flex-1 -ml-4">
+              <div className="flex flex-col items-center justify-center flex-1 -ml-2">
                 <OdometerGauge 
                   value={sensorData.tloop} 
                   min={30} 
