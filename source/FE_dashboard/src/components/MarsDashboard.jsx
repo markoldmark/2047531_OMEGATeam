@@ -148,21 +148,17 @@ const MarsDashboard = () => {
           <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-amber-500/45 p-4 flex flex-col shadow-lg relative">
             <div className="text-center text-amber-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Habitat</div>
             
-            {/* Layout a 3 Colonne Equilibrate */}
-            <div className="flex justify-between items-center flex-grow h-full gap-4">
+            <div className="flex justify-between items-stretch flex-grow h-full gap-2">
               
-              {/* COLONNA 1: Odometro */}
-              <div className="flex-1 flex flex-col items-center justify-start h-full">
-                <OdometerGauge value={sensorData.co2} min={0} max={2000} label="co2" needleColor="bg-rose-500" />
+              <div className="flex-1 flex flex-col items-center justify-start pt-2 h-full">
+                <OdometerGauge value={sensorData.co2} min={0} max={2000} scale={1.15} label="co2" needleColor="bg-rose-500" />
               </div>
               
-              {/* COLONNA 2: Grafico e Pressione */}
-              <div className="flex-1 flex flex-col items-center justify-evenly h-full gap-2">
+              <div className="flex-[1.2] flex flex-col items-center justify-between h-full pb-2">
                   <O2Graph data={sensorData.oxygen_history || []} label="o2%" />
                   <PressureDisplay value={sensorData.pressure} label="pressure" />
               </div>
               
-              {/* COLONNA 3: Barre Verticali */}
               <div className="flex-1 flex justify-center items-center gap-6 h-full">
                 <VerticalBarGauge value={sensorData.pm25} min={0} max={100} label="pm25" unit="" fillColor="from-rose-500 to-pink-500" tickCount={5} />
                 <VerticalBarGauge value={sensorData.humidity} min={0} max={100} label="hum" unit="%" fillColor="from-slate-300 to-white" tickCount={5} />
@@ -219,10 +215,8 @@ const MarsDashboard = () => {
           <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-red-500/45 p-4 flex flex-col shadow-lg relative">
             <div className="text-center text-red-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Power</div>
             
-            {/* Cambiato items-stretch in items-center per centrare verticalmente l'odometro rispetto alle barre */}
             <div className="flex justify-between items-center flex-grow gap-2 h-full px-2">
               
-              {/* Aggiunto flex-1 per dire "prenditi metà dello spazio disponibile" */}
               <div className="flex flex-col items-center justify-center flex-1">
                 <OdometerGauge 
                   value={sensorData.tloop} 
@@ -234,7 +228,6 @@ const MarsDashboard = () => {
                 />
               </div>
               
-              {/* Aggiunto flex-1 anche qui, così si bilanciano perfettamente con l'odometro */}
               <div className="flex gap-3 h-full justify-end flex-1"> 
                 <div className="flex gap-3 h-full">
                   <VerticalBarGauge value={sensorData.voltage} min={0} max={800} label="v" fillColor="from-slate-400 to-slate-200" tickCount={5} />
