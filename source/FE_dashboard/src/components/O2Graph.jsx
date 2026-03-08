@@ -36,7 +36,7 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
   return (
     <div className="flex flex-col items-center w-full">
       {/* Contenitore principale: larghezza ridotta da w-[180px] a w-[140px] per dare respiro alle barre laterali */}
-      <div className="relative w-[140px] h-[100px]">
+      <div className="relative w-[120px] h-[100px]">
         
         {/* Sfondo Dark con Griglia */}
         <div className="absolute left-8 top-0 right-0 bottom-6 bg-slate-900/60 rounded-tr-xl border border-white/5 shadow-inner z-0 overflow-hidden backdrop-blur-sm">
@@ -74,7 +74,7 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
         </div>
       </div>
 
-      <div className="text-slate-400 font-semibold text-xs mt-1 uppercase tracking-[0.2em] -mt-4">
+      <div className="text-slate-400 font-semibold text-xs mt-1 uppercase tracking-[0.2em] -mt-6 ml-6 scale-75">
         {label}
       </div>
     </div>
