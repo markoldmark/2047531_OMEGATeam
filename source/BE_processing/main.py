@@ -17,6 +17,11 @@ DB_CONFIG = {
     "password": "mars_password",
     "host": "db"
 }
+
+APP_STATE = {
+    "cached_rules": []
+}
+
 SIMULATOR_URL = os.getenv("SIMULATOR_URL", "http://simulator:8080")
 rule_activation_state = {}
 
@@ -113,14 +118,24 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
     """Processa un evento dal broker e valuta le regole compatibili."""
     async with message.process():
         event = json.loads(message.body.decode())
-        if event.get("event_type") == "RULE_TRIGGER":
+        event_type = event.get("event_type")
+        
+        # 1. Ignora la history dei trigger
+        if event_type == "RULE_TRIGGER":
+            return
+            
+        # 2. Intercetta la notifica dalla Presentation e aggiorna la cache!
+        if event_type == "RULE_UPDATED":
+            print("[PROCESSOR] 🔄 Ricevuto RULE_UPDATED: Aggiorno la cache delle regole dal DB...")
+            APP_STATE["cached_rules"] = fetch_rules()
             return
 
+        # 3. Logica standard per la telemetria (USANDO LA CACHE)
         source = event.get("source_name")
         measurements = event.get("measurements", {})
         
-        rules = fetch_rules()
-        for rule in rules:
+        # Iteriamo sulla lista dentro APP_STATE
+        for rule in APP_STATE["cached_rules"]:
             if rule['source_name'] == source:
                 current_value = extract_metric_value(measurements, rule['metric_key'])
                 
@@ -133,6 +148,8 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
 
 async def main():
     print(f"[PROCESSOR] Connessione a RabbitMQ: {RABBITMQ_HOST}")
+    APP_STATE["cached_rules"] = fetch_rules()
+    
     while True:
         try:
             connection = await aio_pika.connect_robust(f"amqp://guest:guest@{RABBITMQ_HOST}/")
