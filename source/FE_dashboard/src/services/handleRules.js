@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { buildConditionKey, getConditionConfigFromRule } from './ruleConfig';
 
 // Sostituisci con l'URL base del tuo backend Presentation (es. se gira su localhost:8000)
 const API_BASE_URL = 'http://localhost:8000'; 
@@ -12,12 +13,13 @@ export const useRules = (backendRules = []) => {
       .filter(r => r.action_type !== 'UI_ALERT') 
       .map(r => ({
         id: r.rule_id,               // Il DB usa rule_id
-        sensor: r.source_name,
+        conditionKey: buildConditionKey(r.source_name, r.metric_key),
         operator: r.operator,
         value: r.threshold,
         actuator: r.target,
         action: r.payload,
-        isActive: r.is_active
+        isActive: r.is_active,
+        conditionLabel: getConditionConfigFromRule(r)?.label ?? `${r.source_name} (${r.metric_key})`
       }));
 
     setRules(mappedRules);
@@ -27,13 +29,14 @@ export const useRules = (backendRules = []) => {
   const handleSaveRule = async (newRuleForm) => {
     // 1. Assicuriamoci che l'ID sia una stringa come richiesto dal DB (es. "rule_171000000")
     const ruleId = typeof newRuleForm.id === 'number' ? `rule_${newRuleForm.id}` : newRuleForm.id;
+    const [sourceName, metricKey] = newRuleForm.conditionKey.split('::');
 
     // 2. Prepariamo il payload per il backend (RuleSchema)
     const payload = {
       rule_id: ruleId,
-      description: `Auto Rule: ${newRuleForm.sensor} -> ${newRuleForm.actuator}`,
-      source_name: newRuleForm.sensor,
-      metric_key: "value", // Nota: per i sensori REST di solito è "value". Se hai sensori più complessi potresti doverlo mappare dinamicamente
+      description: `Auto Rule: ${sourceName} (${metricKey}) -> ${newRuleForm.actuator}`,
+      source_name: sourceName,
+      metric_key: metricKey,
       operator: newRuleForm.operator,
       threshold: newRuleForm.value.toString(), // Il DB lo vuole come stringa
       action_type: "ACTUATOR_COMMAND",

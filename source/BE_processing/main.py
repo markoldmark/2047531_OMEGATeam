@@ -87,9 +87,11 @@ def evaluate_condition(value, operator, threshold):
         if operator == '>=': return val >= thr
         if operator == '<': return val < thr
         if operator == '<=': return val <= thr
-        if operator == '=': return val == thr
+        if operator in {'=', '=='}: return val == thr
+        if operator == '!=': return val != thr
     except (ValueError, TypeError):
-        if operator == '=': return str(value) == str(threshold)
+        if operator in {'=', '=='}: return str(value) == str(threshold)
+        if operator == '!=': return str(value) != str(threshold)
     return False
 
 def extract_metric_value(measurements, metric_key):

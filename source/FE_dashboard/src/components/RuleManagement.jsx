@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ACTUATOR_OPTIONS, CONDITION_OPTIONS, OPERATOR_OPTIONS, getConditionConfig } from '../services/ruleConfig';
 
 const PauseIcon = () => (
   <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor" aria-hidden="true">
@@ -24,38 +25,12 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
   const [activeTab, setActiveTab] = useState('list'); 
   const [editingId, setEditingId] = useState(null);
 
-  const defaultRule = { sensor: 'greenhouse_temperature', operator: '>', value: '', actuator: 'cooling_fan', action: 'ON', isActive: true };
+  const defaultRule = { conditionKey: 'greenhouse_temperature::value', operator: '>', value: '', actuator: 'cooling_fan', action: 'ON', isActive: true };
   const [ruleForm, setRuleForm] = useState(defaultRule);
 
-  // ... (sensors e actuators arrays rimangono uguali a prima) ...
-  const sensors = [
-    { id: 'greenhouse_temperature', label: 'Greenhouse Temp (REST)' },
-    { id: 'entrance_humidity', label: 'Entrance Humidity (REST)' },
-    { id: 'co2_hall', label: 'CO2 Hall (REST)' },
-    { id: 'hydroponic_ph', label: 'Hydroponic pH (REST)' },
-    { id: 'water_tank_level', label: 'Water Tank Level (REST)' },
-    { id: 'corridor_pressure', label: 'Corridor Pressure (REST)' },
-    { id: 'air_quality_pm25', label: 'Air Quality PM2.5 (REST)' },
-    { id: 'air_quality_voc', label: 'Air Quality VOC (REST)' },
-    { id: 'mars/telemetry/solar_array', label: 'Solar Array (Stream)' },
-    { id: 'mars/telemetry/radiation', label: 'Radiation (Stream)' },
-    { id: 'mars/telemetry/life_support', label: 'Life Support (Stream)' },
-    { id: 'mars/telemetry/thermal_loop', label: 'Thermal Loop (Stream)' },
-    { id: 'mars/telemetry/power_bus', label: 'Power Bus (Stream)' },
-    { id: 'mars/telemetry/power_consumption', label: 'Power Consump. (Stream)' },
-    { id: 'mars/telemetry/airlock', label: 'Airlock (Stream)' },
-  ];
-
-  const actuators = [
-    { id: 'cooling_fan', label: 'Cooling Fan' },
-    { id: 'entrance_humidifier', label: 'Entrance Humidifier' },
-    { id: 'hall_ventilation', label: 'Hall Ventilation' },
-    { id: 'habitat_heater', label: 'Habitat Heater' },
-  ];
-  const operators = ['<', '<=', '=', '>', '>='];
-
-  const getSensorLabel = (id) => sensors.find(s => s.id === id)?.label || id;
-  const getActuatorLabel = (id) => actuators.find(a => a.id === id)?.label || id;
+  const getConditionLabel = (conditionKey) => getConditionConfig(conditionKey)?.label || conditionKey;
+  const getActuatorLabel = (id) => ACTUATOR_OPTIONS.find(a => a.id === id)?.label || id;
+  const selectedCondition = getConditionConfig(ruleForm.conditionKey) ?? CONDITION_OPTIONS[0];
 
   const handleChange = (e) => setRuleForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -91,7 +66,7 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
           {activeTab === 'list' && (
             <div className="flex flex-col gap-4">
               {rules.length === 0 ? (
-                <div className="text-center p-8 text-slate-500 text-sm tracking-wider border border-dashed border-white/10 rounded-2xl">No active rules.</div>
+                <div className="text-center p-8 text-slate-500 text-sm tracking-wider border border-dashed border-white/10 rounded-2xl">No rules configured.</div>
               ) : (
                 rules.map(r => (
                   <div key={r.id} className="bg-slate-800/50 p-4 rounded-2xl border border-white/5 flex justify-between items-center hover:border-cyan-500/30 transition-colors">
@@ -107,7 +82,7 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold text-slate-500 uppercase">IF</span>
-                        <span className="text-sm text-cyan-300 font-mono bg-slate-900 px-2 py-1 rounded">{getSensorLabel(r.sensor)}</span>
+                        <span className="text-sm text-cyan-300 font-mono bg-slate-900 px-2 py-1 rounded">{r.conditionLabel || getConditionLabel(r.conditionKey)}</span>
                         <span className="text-emerald-400 font-bold">{r.operator}</span>
                         <span className="text-sm text-white font-mono bg-slate-900 px-2 py-1 rounded">{r.value}</span>
                       </div>
@@ -144,13 +119,13 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
               <div className="bg-slate-800/50 p-6 rounded-2xl border border-white/5">
                 <span className="font-semibold text-xs tracking-widest uppercase mb-4 block text-slate-400">Condition</span>
                 <div className="grid grid-cols-12 gap-4">
-                  <select name="sensor" value={ruleForm.sensor} onChange={handleChange} className="col-span-6 p-3 rounded-lg border border-slate-700 bg-slate-900 text-cyan-300 text-sm focus:border-cyan-500 outline-none">
-                    {sensors.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+                  <select name="conditionKey" value={ruleForm.conditionKey} onChange={handleChange} className="col-span-6 p-3 rounded-lg border border-slate-700 bg-slate-900 text-cyan-300 text-sm focus:border-cyan-500 outline-none">
+                    {CONDITION_OPTIONS.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
                   </select>
                   <select name="operator" value={ruleForm.operator} onChange={handleChange} className="col-span-3 p-3 rounded-lg border border-slate-700 bg-slate-900 text-emerald-400 font-bold text-center focus:border-cyan-500 outline-none">
-                    {operators.map(op => <option key={op} value={op}>{op}</option>)}
+                    {OPERATOR_OPTIONS.map(op => <option key={op} value={op}>{op}</option>)}
                   </select>
-                  <input type="number" name="value" value={ruleForm.value} onChange={handleChange} placeholder="Value" className="col-span-3 p-3 rounded-lg border border-slate-700 bg-slate-900 text-white font-mono focus:border-cyan-500 outline-none" required />
+                  <input type={selectedCondition.valueType === 'text' ? 'text' : 'number'} name="value" value={ruleForm.value} onChange={handleChange} placeholder={selectedCondition.valueType === 'text' ? 'State' : 'Value'} className="col-span-3 p-3 rounded-lg border border-slate-700 bg-slate-900 text-white font-mono focus:border-cyan-500 outline-none" required />
                 </div>
               </div>
 
@@ -158,7 +133,7 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
                 <span className="font-semibold text-xs tracking-widest uppercase mb-4 block text-slate-400">Action</span>
                 <div className="grid grid-cols-12 gap-4 items-center">
                   <select name="actuator" value={ruleForm.actuator} onChange={handleChange} className="col-span-8 p-3 rounded-lg border border-slate-700 bg-slate-900 text-amber-300 text-sm focus:border-cyan-500 outline-none">
-                    {actuators.map(a => <option key={a.id} value={a.id}>{a.label}</option>)}
+                    {ACTUATOR_OPTIONS.map(a => <option key={a.id} value={a.id}>{a.label}</option>)}
                   </select>
                   <select name="action" value={ruleForm.action} onChange={handleChange} className="col-span-4 p-3 rounded-lg border border-slate-700 bg-slate-900 text-white font-bold text-center focus:border-cyan-500 outline-none">
                     <option value="ON">ON</option>
