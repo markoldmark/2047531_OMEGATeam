@@ -235,17 +235,38 @@ const MarsDashboard = () => {
                   onClick={() => toggleActuator(act)} 
                   disabled={isAuto}
                   className={`
-                    rounded-xl font-bold text-center text-xs tracking-wider h-full whitespace-pre-line transition-all duration-150 outline-none
+                    relative overflow-hidden rounded-2xl border h-full whitespace-pre-line transition-all duration-150 outline-none
                     ${actuators[act] 
-                      /* STATO ACCESO (ON) - Scende di 10px (per coprire l'ombra), si rimpicciolisce al 97% e perde l'ombra */
-                      ? 'bg-red-500 text-black translate-y-[6px] scale-[0.90] shadow-none' 
-                      /* STATO SPENTO (OFF) - Alzato: faccia red-500, spessore 10px scuro (#930b0b). 
-                        Aggiunto active:scale-[0.97] per quando lo clicchi col mouse! */
-                      : 'bg-red-500 text-black shadow-[0_6px_0_#930b0b] hover:translate-y-[6px] hover:shadow-none active:translate-y-[6px] active:scale-[0.90] active:shadow-none'
+                      ? 'translate-y-[3px] border-cyan-100 bg-gradient-to-b from-cyan-100 via-cyan-300 to-cyan-500 text-slate-950 shadow-[inset_0_3px_8px_rgba(255,255,255,0.5),inset_0_-4px_8px_rgba(8,47,73,0.35),0_2px_0_#155e75,0_6px_14px_rgba(8,145,178,0.35)] ring-2 ring-cyan-300/30'
+                      : 'border-slate-400 bg-gradient-to-b from-slate-500 via-slate-700 to-slate-900 text-slate-100 shadow-[inset_0_2px_4px_rgba(255,255,255,0.18),inset_0_-6px_8px_rgba(15,23,42,0.45),0_4px_0_#0f172a,0_10px_18px_rgba(2,6,23,0.42)] hover:-translate-y-0.5 hover:shadow-[inset_0_2px_4px_rgba(255,255,255,0.18),inset_0_-6px_8px_rgba(15,23,42,0.45),0_5px_0_#0f172a,0_14px_22px_rgba(2,6,23,0.48)] active:translate-y-[3px] active:shadow-[inset_0_2px_4px_rgba(255,255,255,0.18),inset_0_-6px_8px_rgba(15,23,42,0.45),0_2px_0_#0f172a,0_6px_12px_rgba(2,6,23,0.38)]'
                     }
                   `} 
+                  aria-pressed={actuators[act]}
+                  aria-disabled={isAuto}
                 >
-                  {act.replace(/([A-Z])/g, '\n$1').toUpperCase()}
+                  <div className={`absolute inset-[3px] rounded-[14px] border pointer-events-none ${
+                    actuators[act] ? 'border-white/35' : 'border-white/10'
+                  }`} aria-hidden="true" />
+                  {actuators[act] && (
+                    <div className="absolute inset-x-4 top-2 h-2 rounded-full bg-white/45 blur-sm" aria-hidden="true" />
+                  )}
+                  <div className="relative z-10 flex h-full flex-col items-center justify-center gap-2 px-2">
+                    <span className={`inline-flex h-2.5 w-2.5 rounded-full ${
+                      actuators[act]
+                        ? 'bg-cyan-50 shadow-[0_0_10px_rgba(255,255,255,0.95)]'
+                        : 'bg-slate-300/70 shadow-[inset_0_1px_2px_rgba(255,255,255,0.25)]'
+                    }`} />
+                    <span className="font-black text-[10px] tracking-[0.16em] leading-tight">
+                      {act.replace(/([A-Z])/g, '\n$1').toUpperCase()}
+                    </span>
+                    <span className={`rounded-full px-2 py-0.5 text-[8px] font-bold tracking-[0.18em] ${
+                      actuators[act]
+                        ? 'bg-slate-950/15 text-slate-950 border border-slate-950/10'
+                        : 'bg-black/15 text-slate-200 border border-white/10'
+                    }`}>
+                      {actuators[act] ? 'ON' : 'OFF'}
+                    </span>
+                  </div>
                 </button>
               ))}
             </div>
