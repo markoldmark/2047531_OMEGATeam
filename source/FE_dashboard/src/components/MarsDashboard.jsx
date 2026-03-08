@@ -202,18 +202,23 @@ const MarsDashboard = () => {
           </div>
 
           {/* CENTER ACTUATORS */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900 p-4 rounded-[30px] border-4 border-slate-700 shadow-2xl z-20">
-            <div className="grid grid-cols-2 gap-3 w-[300px] h-[200px]">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-950 p-6 rounded-[30px] border-4 border-slate-700 shadow-2xl z-20">
+            <div className="grid grid-cols-2 gap-5 w-[300px] h-[200px]">
               {['coolingFan', 'habitatHeater', 'entranceHumidifier', 'hallVentilation'].map((act) => (
                 <button 
                   key={act}
                   onClick={() => toggleActuator(act)} 
-                  className={`rounded-2xl border-2 font-bold text-center text-xs tracking-wider transition-colors duration-200 ${
-                    actuators[act] 
-                      ? 'bg-cyan-600 border-cyan-400 text-white shadow-[0_0_15px_rgba(8,145,178,0.8)]' 
-                      : 'bg-slate-800 border-slate-600 text-slate-400 hover:bg-slate-700'
-                  }`} 
                   disabled={isAuto}
+                  className={`
+                    rounded-xl font-bold text-center text-xs tracking-wider h-full transition-all duration-150 outline-none
+                    ${actuators[act] 
+                      /* STATO ACCESO (ON) - Scende di 10px (per coprire l'ombra), si rimpicciolisce al 97% e perde l'ombra */
+                      ? 'bg-red-500 text-white translate-y-[6px] scale-[0.90] shadow-none' 
+                      /* STATO SPENTO (OFF) - Alzato: faccia red-500, spessore 10px scuro (#930b0b). 
+                        Aggiunto active:scale-[0.97] per quando lo clicchi col mouse! */
+                      : 'bg-red-500 text-black shadow-[0_6px_0_#930b0b] hover:translate-y-[6px] hover:shadow-none active:translate-y-[6px] active:scale-[0.90] active:shadow-none'
+                    }
+                  `} 
                 >
                   {act.replace(/([A-Z])/g, ' $1').toUpperCase()}
                 </button>
