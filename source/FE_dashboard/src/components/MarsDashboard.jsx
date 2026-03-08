@@ -370,7 +370,7 @@ const MarsDashboard = () => {
           )}
         </div>
 
-        <aside className="bg-slate-950/88 rounded-[40px] p-5 shadow-2xl border border-slate-700/80 ring-1 ring-white/5 flex flex-col self-start h-full max-h-[calc(100vh-1rem)] overflow-hidden">
+        <aside className="bg-slate-950/88 rounded-[40px] p-5 shadow-2xl border border-slate-700/80 ring-1 ring-white/5 flex flex-col self-start h-[760px] max-h-[calc(100vh-1rem)] overflow-hidden">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <div className="text-white font-black text-lg tracking-[0.2em] uppercase">Action History</div>
