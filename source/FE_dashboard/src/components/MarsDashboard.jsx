@@ -96,22 +96,27 @@ const MarsDashboard = () => {
          {/* 2. HABITAT */}
           <div className="bg-slate-800 rounded-[30px] border-2 border-amber-500/50 p-4 flex flex-col shadow-lg relative">
             <div className="text-center text-amber-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Habitat</div>
-            <div className="flex justify-between items-stretch flex-grow gap-6">
-              <div className="flex flex-col items-center justify-start">
+            
+            {/* Layout a 3 Colonne Equilibrate */}
+            <div className="flex justify-between items-center flex-grow h-full gap-2">
+              
+              {/* COLONNA 1: Odometro */}
+              <div className="flex-1 flex flex-col items-center justify-start h-full">
                 <OdometerGauge value={sensorData.co2} min={500} max={2000} label="co2" needleColor="bg-rose-500" />
               </div>
-              <div className="flex flex-col gap-4 items-center justify-start">
-                <div className="flex flex-col items-center scale-50 justify-start -mt-8">
-                  <O2Graph data={sensorData.oxygen_history || []} label="o2 %" />
-                </div>
-                <div className="flex flex-col items-center -mt-4">
-                  <PressureDisplay value={sensorData.pressure} label="press" />
-                </div>
+              
+              {/* COLONNA 2: Grafico e Pressione */}
+              <div className="flex-1 flex flex-col items-center justify-evenly h-full gap-2">
+                  <O2Graph data={sensorData.oxygen_history || []} label="o2%" />
+                  <PressureDisplay value={sensorData.pressure} label="pressure" />
               </div>
-              <div className="flex gap-6 h-64">
+              
+              {/* COLONNA 3: Barre Verticali */}
+              <div className="flex-1 flex justify-center items-center gap-6 h-full">
                 <VerticalBarGauge value={sensorData.pm25} min={0} max={100} label="pm25" unit="" fillColor="from-rose-500 to-pink-500" tickCount={5} />
                 <VerticalBarGauge value={sensorData.humidity} min={0} max={100} label="hum" unit="%" fillColor="from-slate-300 to-white" tickCount={5} />
               </div>
+              
             </div>
           </div>
 

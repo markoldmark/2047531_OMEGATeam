@@ -149,7 +149,7 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
 async def main():
     print(f"[PROCESSOR] Connessione a RabbitMQ: {RABBITMQ_HOST}")
     APP_STATE["cached_rules"] = fetch_rules()
-    
+
     while True:
         try:
             connection = await aio_pika.connect_robust(f"amqp://guest:guest@{RABBITMQ_HOST}/")
