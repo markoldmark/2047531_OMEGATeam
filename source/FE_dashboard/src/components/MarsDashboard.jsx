@@ -68,11 +68,19 @@ const formatHistoryTimestamp = (timestamp) => {
 };
 
 const MarsDashboard = () => {
-  const [isAuto, setIsAuto] = useState(true);
+  // Modifica questi due stati:
+  const [isAuto, setIsAuto] = useState(() => {
+    const saved = localStorage.getItem('mars_isAuto');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  const [pausedByManual, setPausedByManual] = useState(() => {
+    const saved = localStorage.getItem('mars_pausedByManual');
+    return saved !== null ? JSON.parse(saved) : [];
+  });
+
   const [manualError, setManualError] = useState('');
   const [isRuleManagerOpen, setIsRuleManagerOpen] = useState(false);
-
-  const [pausedByManual, setPausedByManual] = useState([]);
 
   const { sensorData, rules: backendRules, history, actuators, sendActuatorCommand } = useMarsData();
   const { rules: managedRules, handleSaveRule, handleDeleteRule, handleToggleRule } = useRules(backendRules);
@@ -104,22 +112,25 @@ const MarsDashboard = () => {
   const handleModeToggle = () => {
     const nextIsAuto = !isAuto;
     setIsAuto(nextIsAuto);
+    // Salva la nuova modalità (Auto o Manual) nel browser
+    localStorage.setItem('mars_isAuto', JSON.stringify(nextIsAuto));
 
     if (!nextIsAuto) {
-      // 1. Stiamo passando a MANUAL. Trovo tutte le regole attive al momento.
+      // Passaggio a MANUAL
       const activeRuleIds = managedRules.filter(rule => rule.isActive).map(rule => rule.id);
-      
-      // 2. Mi salvo i loro ID per ricordarmeli.
       setPausedByManual(activeRuleIds);
       
-      // 3. Uso il tuo hook per mettere in pausa singolarmente ogni regola.
+      // Salva l'array degli ID nel browser
+      localStorage.setItem('mars_pausedByManual', JSON.stringify(activeRuleIds));
+      
       activeRuleIds.forEach(id => handleToggleRule(id, false));
     } else {
-      // 1. Stiamo tornando ad AUTO. Riattivo SOLO le regole salvate in precedenza.
+      // Passaggio ad AUTO
       pausedByManual.forEach(id => handleToggleRule(id, true));
-      
-      // 2. Svuoto l'array perché non mi serve più.
       setPausedByManual([]);
+      
+      // Svuota l'array salvato nel browser
+      localStorage.setItem('mars_pausedByManual', JSON.stringify([]));
     }
   };
 
