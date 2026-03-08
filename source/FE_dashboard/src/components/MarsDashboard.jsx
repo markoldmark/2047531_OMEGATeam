@@ -155,7 +155,7 @@ const MarsDashboard = () => {
               </div>
               <div className="flex flex-col justify-start items-end align-center w-full">
                 <div className="flex items-baseline justify-start gap-2 w-full">
-                  <span className="text-xs font-bold text-emerald-300 uppercase tracking-widest mt-auto ml-2">PH</span>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-auto ml-2">PH</span>
                 </div>
                 <div className="flex flex-row justify-end content-center gap-4 w-full mt-2">
                   <HorizontalBarGauge value={sensorData.ph} min={0} max={14} tickCount={7} label="" fillColor="from-emerald-400 to-teal-500" emptyColor="bg-slate-700" />
@@ -324,7 +324,7 @@ const MarsDashboard = () => {
               </button>
             </div>
 
-            <div className="bg-slate-900/80 backdrop-blur-sm h-full rounded-2xl w-[30%] px-6 flex items-center justify-center border-2 border-slate-600/85 shadow-lg gap-4">
+            <div className="bg-slate-900/80 backdrop-blur-sm h-full rounded-2xl px-6 flex items-center justify-center border-2 border-slate-600/85 shadow-lg gap-4">
               <span className={`font-bold text-xl ${!isAuto ? 'text-cyan-400' : 'text-slate-500'}`}>MANUAL</span>
               <div className="w-20 h-10 bg-slate-950 rounded-full p-1 cursor-pointer relative border-2 border-slate-600 shadow-inner" onClick={() => setIsAuto(!isAuto)}>
                 <div className={`w-7 h-7 rounded-full shadow-md transition-transform duration-300 ease-in-out absolute top-1 ${isAuto ? 'translate-x-10 bg-emerald-500' : 'translate-x-0 bg-cyan-500'}`}></div>

@@ -34,7 +34,7 @@ INSERT INTO automation_rules (rule_id, description, source_name, metric_key, ope
 VALUES ('rule_004', 'US5 - Attiva umidificatore con umidita ingresso sotto 40%', 'entrance_humidity', 'value', '<', '40', 'ACTUATOR_COMMAND', 'entrance_humidifier', 'ON');
 
 INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
-VALUES ('rule_005', 'US6 - Raffredda oltre 45C nel thermal loop', 'mars/telemetry/thermal_loop', 'temperature_c', '>', '45', 'ACTUATOR_COMMAND', 'cooling_fan', 'ON');
+VALUES ('rule_005', 'US6 - Raffredda oltre 55C nel thermal loop', 'mars/telemetry/thermal_loop', 'temperature_c', '>', '55', 'ACTUATOR_COMMAND', 'cooling_fan', 'ON');
 
 INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
 VALUES ('rule_006', 'US7 - Ventila il corridoio oltre 950 ppm di CO2', 'co2_hall', 'value', '>', '950', 'ACTUATOR_COMMAND', 'hall_ventilation', 'ON');
