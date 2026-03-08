@@ -16,7 +16,8 @@ export const useRules = (backendRules = []) => {
         operator: r.operator,
         value: r.threshold,
         actuator: r.target,
-        action: r.payload
+        action: r.payload,
+        isActive: r.is_active
       }));
 
     setRules(mappedRules);
@@ -38,7 +39,7 @@ export const useRules = (backendRules = []) => {
       action_type: "ACTUATOR_COMMAND",
       target: newRuleForm.actuator,
       payload: newRuleForm.action,
-      is_active: true
+      is_active: newRuleForm.isActive ?? true
     };
 
     try {
@@ -62,7 +63,7 @@ export const useRules = (backendRules = []) => {
         // 4. Aggiornamento ottimistico dell'UI
         setRules(prevRules => {
           const exists = prevRules.find(r => r.id === ruleId);
-          const uiRule = { ...newRuleForm, id: ruleId };
+          const uiRule = { ...newRuleForm, id: ruleId, isActive: newRuleForm.isActive ?? true };
           
           if (exists) {
             return prevRules.map(r => r.id === ruleId ? uiRule : r);
@@ -98,5 +99,29 @@ export const useRules = (backendRules = []) => {
     }
   };
 
-  return { rules, handleSaveRule, handleDeleteRule };
+  const handleToggleRule = async (idToToggle, isActive) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/rules/${idToToggle}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ is_active: isActive })
+      });
+
+      if (response.ok) {
+        setRules(prevRules =>
+          prevRules.map(rule =>
+            rule.id === idToToggle ? { ...rule, isActive } : rule
+          )
+        );
+      } else {
+        console.error("Errore durante il toggle della regola:", await response.text());
+      }
+    } catch (error) {
+      console.error("Errore di rete durante il toggle della regola:", error);
+    }
+  };
+
+  return { rules, handleSaveRule, handleDeleteRule, handleToggleRule };
 };

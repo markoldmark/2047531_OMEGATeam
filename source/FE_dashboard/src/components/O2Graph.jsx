@@ -50,12 +50,18 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
           {Array.from({ length: 11 }).map((_, i) => {
             const val = 21.0 - i * 0.1;
             const topPercent = (i / 10) * 100;
+            // Mostra il testo solo per gli indici pari (0=21.0, 2=20.8, 4=20.6, ecc.)
+            const showText = i % 2 === 0; 
+
             return (
               <div key={`tenth-${i}`} className="absolute right-0 flex items-center justify-end w-full" style={{ top: `${topPercent}%`, transform: 'translateY(-50%)' }}>
-                <span className={`text-[9px] font-semibold mr-1 leading-none tracking-wider ${val === 20.5 ? 'text-rose-400 drop-shadow-[0_0_5px_rgba(251,113,133,0.8)]' : 'text-slate-500'}`}>
-                  {val.toFixed(1)}
-                </span>
-                <div className="w-1.5 h-[1px] bg-slate-600"></div>
+                {showText && (
+                  <span className="text-[9px] font-semibold mr-1 leading-none tracking-wider text-slate-500">
+                    {val.toFixed(1)}
+                  </span>
+                )}
+                {/* Rende la lineetta leggermente più corta se non è accompagnata dal numero, per un look più pulito */}
+                <div className={`h-[1px] bg-slate-600 ${showText ? 'w-1.5' : 'w-1'}`}></div>
               </div>
             );
           })}
