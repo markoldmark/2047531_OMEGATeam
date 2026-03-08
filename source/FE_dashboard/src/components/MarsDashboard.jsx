@@ -145,32 +145,56 @@ const MarsDashboard = () => {
 
           {/* 3. AIRLOCK */}
           <div className="bg-cyan-200 rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner relative">
-            <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-4">airlock</div>
-             
-             <div className="flex justify-between items-stretch flex-grow gap-6 h-full">
-               <div className="flex flex-col items-center justify-center w-[40%]">
-                  <OdometerGauge value={sensorData.radiation} min={0} max={10} label="radiation" needleColor="bg-blue-600" />
+              {/* TITOLO SUPERIORE */}
+              <div className="text-center text-black font-bold text-xl tracking-widest uppercase opacity-70 mb-6">
+                airlock
+              </div>
+
+              {/* CONTAINER PRINCIPALE IN GRIGLIA */}
+              <div className="grid grid-cols-2 gap-4 flex-grow items-center">
+                
+                {/* RIGA 1 - COLONNA 1: Radiation Gauge */}
+                <div className="flex flex-col items-center justify-center">
+                  <OdometerGauge 
+                    value={sensorData.radiation} 
+                    min={0} 
+                    max={10} 
+                    label="radiation" 
+                    needleColor="bg-blue-600" 
+                  />
                 </div>
-             </div>
-              <div className="flex flex-col justify-start items-end align-center w-full">
-                <div className="flex items-baseline justify-between gap-2 w-full">
-                  <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.airlockCycles])} text="!" activeColor="bg-yellow-400" />
+
+                {/* RIGA 1 - COLONNA 2: Spy Indicators (D, P, I) */}
+                <div className="flex flex-col gap-3 items-left justify-center border-l border-black/10">
+                  <Spy label="D" isOn={sensorData.statusD} />
+                  <Spy label="P" isOn={sensorData.statusP} />
+                  <Spy label="I" isOn={sensorData.statusI} />
                 </div>
-                <div className="flex flex-row justify-end content-center gap-4 w-full">
-                    <HorizontalBarGauge value={sensorData.airlock_cycles} min={0} max={20} label="cycles" fillColor="bg-blue-600" emptyColor="bg-blue-200" />
+
+                {/* RIGA 2 - COLONNA UNICA (Tutta larghezza): Cycles + Warning */}
+                <div className="col-span-2 mt-2 pt-4 border-t border-black/10">
+                  <div className="flex flex-col items-center gap-2 w-full">
+                    <div className="flex items-center gap-4 w-full justify-center">
+                      <WarningLight 
+                        isOn={Boolean(activeAlerts[ALERT_TARGETS.airlockCycles])} 
+                        text="!" 
+                        activeColor="bg-yellow-400" 
+                      />
+                      <div className="flex-grow max-w-[80%]">
+                        <HorizontalBarGauge 
+                          value={sensorData.airlock_cycles} 
+                          min={0} 
+                          max={20} 
+                          label="cycles" 
+                          fillColor="bg-blue-600" 
+                          emptyColor="bg-blue-200" 
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-3 items-end justify-start mr-40 mt-[-220px]">
-                <Spy label="D" isOn={sensorData.statusD} />
-                <Spy label="P" isOn={sensorData.statusP} />
-                <Spy label="I" isOn={sensorData.statusI} />
               </div>
-             <div className="mt-auto pt-4 flex justify-center"> 
-                <div className="text-black font-bold text-xl tracking-widest uppercase opacity-80">
-                  airlock
-                </div>
-             </div>
-          </div>
+            </div>
 
           {/* 4. POWER */}
           <div className="bg-[#fed7aa] rounded-[30px] border-[3px] border-gray-500 p-4 flex flex-col shadow-inner relative">
