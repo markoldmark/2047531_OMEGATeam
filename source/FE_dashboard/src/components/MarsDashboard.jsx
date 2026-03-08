@@ -124,7 +124,7 @@ const MarsDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden bg-[#070b12] text-slate-100 font-sans">
+    <div className="h-screen w-full relative overflow-hidden bg-[#070b12] text-slate-100 font-sans">
       <style>{`
         .mars-scrollbar::-webkit-scrollbar {
           width: 6px;
@@ -150,13 +150,8 @@ const MarsDashboard = () => {
       <div className="absolute inset-x-0 bottom-[-8vh] h-[34vh] rounded-[100%] bg-[#6f2a16]/60 blur-3xl" aria-hidden="true" />
       <div className="absolute inset-x-0 bottom-0 h-[26vh] bg-gradient-to-t from-[#2a140c] via-[#6b2b19]/55 to-transparent" aria-hidden="true" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1480px] flex-col justify-center px-8 py-8">
-        <div className="mb-5 flex items-center justify-between px-2">
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-[0.34em] text-orange-300/90">Mars Habitat Command</div>
-            <div className="mt-1 text-sm uppercase tracking-[0.18em] text-slate-300/70">Operations Deck</div>
-          </div>
-        </div>
+      <div className="relative z-10 mx-auto flex h-screen w-full max-w-[1480px] flex-col justify-center px-8 py-8">
+        
 
       <div className="w-full max-w-[1450px] grid xl:grid-cols-[minmax(0,1fr)_360px] gap-6">
         <div className="bg-slate-950/78 backdrop-blur-md rounded-[40px] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.58)] border border-slate-600/70 ring-1 ring-white/5 flex flex-col gap-6">
@@ -337,8 +332,8 @@ const MarsDashboard = () => {
           <div className="flex justify-between items-center gap-4 h-16">
 
             <div className="bg-slate-900/80 backdrop-blur-sm h-full flex-grow rounded-2xl flex items-center justify-center border-2 border-slate-600/85 shadow-lg relative">
-              <span className="text-white font-black text-2xl tracking-[0.3em] uppercase">
-                Dashboard
+              <span className="text-orange-300 font-black text-2xl tracking-[0.3em] uppercase">
+                MARS HABITAT COMMAND
               </span>
               <button 
                 onClick={() => setIsRuleManagerOpen(true)}
