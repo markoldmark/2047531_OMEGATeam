@@ -43,8 +43,8 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 font-sans">
-      <div className="bg-slate-900/90 border border-white/10 rounded-[30px] p-8 max-w-3xl w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col h-[600px]">
+    <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 font-sans">
+      <div className="bg-slate-900/95 border border-white/10 rounded-[30px] p-8 max-w-3xl w-full shadow-2xl flex flex-col h-[600px]">
         
         {/* HEADER */}
         <div className="flex justify-between items-center mb-6">
@@ -61,15 +61,15 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
         </div>
 
         {/* CONTENUTO */}
-        <div className="flex-grow overflow-y-auto pr-2">
+        <div className="flex-grow overflow-y-auto pr-2 overscroll-contain [contain:content]">
           
           {activeTab === 'list' && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 [contain:content]">
               {rules.length === 0 ? (
                 <div className="text-center p-8 text-slate-500 text-sm tracking-wider border border-dashed border-white/10 rounded-2xl">No rules configured.</div>
               ) : (
                 rules.map(r => (
-                  <div key={r.id} className="bg-slate-800/50 p-4 rounded-2xl border border-white/5 flex justify-between items-center hover:border-cyan-500/30 transition-colors">
+                  <div key={r.id} className="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex justify-between items-center">
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest ${
@@ -82,13 +82,13 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold text-slate-500 uppercase">IF</span>
-                        <span className="text-sm text-cyan-300 font-mono bg-slate-900 px-2 py-1 rounded">{r.conditionLabel || getConditionLabel(r.conditionKey)}</span>
+                        <span className="text-sm text-cyan-300 font-mono bg-slate-900 px-2 py-1 rounded border border-slate-700">{r.conditionLabel || getConditionLabel(r.conditionKey)}</span>
                         <span className="text-emerald-400 font-bold">{r.operator}</span>
-                        <span className="text-sm text-white font-mono bg-slate-900 px-2 py-1 rounded">{r.value}</span>
+                        <span className="text-sm text-white font-mono bg-slate-900 px-2 py-1 rounded border border-slate-700">{r.value}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold text-slate-500 uppercase">THEN SET</span>
-                        <span className="text-sm text-amber-300 font-mono bg-slate-900 px-2 py-1 rounded">{getActuatorLabel(r.actuator)}</span>
+                        <span className="text-sm text-amber-300 font-mono bg-slate-900 px-2 py-1 rounded border border-slate-700">{getActuatorLabel(r.actuator)}</span>
                         <span className="text-slate-500">➔</span>
                         <span className={`text-xs font-bold px-2 py-1 rounded ${r.action === 'ON' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>{r.action}</span>
                       </div>
@@ -97,16 +97,16 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
                     <div className="flex gap-2 ml-4">
                       <button
                         onClick={() => onToggleRule(r.id, !r.isActive)}
-                        className={`p-2 rounded-lg border transition-all flex items-center justify-center ${
+                        className={`p-2 rounded-lg border flex items-center justify-center ${
                           r.isActive
-                            ? 'text-amber-300 bg-slate-900 border-amber-500/40 hover:border-amber-400'
-                            : 'text-emerald-300 bg-slate-900 border-emerald-500/40 hover:border-emerald-400'
+                            ? 'text-amber-300 bg-slate-900 border-amber-500/40'
+                            : 'text-emerald-300 bg-slate-900 border-emerald-500/40'
                         }`}
                       >
                         {r.isActive ? <PauseIcon /> : <ResumeIcon />}
                       </button>
-                      <button onClick={() => {setRuleForm(r); setEditingId(r.id); setActiveTab('form');}} className="p-2 text-slate-400 hover:text-cyan-400 bg-slate-900 rounded-lg border border-white/5 hover:border-cyan-500/50 transition-all flex items-center justify-center"><EditIcon /></button>
-                      <button onClick={() => onDeleteRule(r.id)} className="p-2 text-slate-400 hover:text-rose-400 bg-slate-900 rounded-lg border border-white/5 hover:border-rose-500/50 transition-all">🗑️</button>
+                      <button onClick={() => {setRuleForm(r); setEditingId(r.id); setActiveTab('form');}} className="p-2 text-slate-400 bg-slate-900 rounded-lg border border-slate-700 flex items-center justify-center"><EditIcon /></button>
+                      <button onClick={() => onDeleteRule(r.id)} className="p-2 text-slate-400 bg-slate-900 rounded-lg border border-slate-700">🗑️</button>
                     </div>
                   </div>
                 ))
