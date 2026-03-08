@@ -148,13 +148,13 @@ const MarsDashboard = () => {
           <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-amber-500/45 p-4 flex flex-col shadow-lg relative">
             <div className="text-center text-amber-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Habitat</div>
             
-            <div className="flex justify-between items-stretch flex-grow h-full gap-2">
+            <div className="flex justify-between items-stretch flex-grow h-full gap-1">
               
               <div className="flex-1 flex flex-col items-center justify-start h-full">
                 <OdometerGauge value={sensorData.co2} min={0} max={2000} scale={1.15} label="co2" needleColor="bg-rose-500" />
               </div>
               
-              <div className="flex-[1.2] flex flex-col items-center justify-between h-full pb-2">
+              <div className="flex-1 flex flex-col items-center justify-between h-full pb-2 w-[28%] -ml-2">
                   <O2Graph data={sensorData.oxygen_history || []} label="o2%" />
                   <PressureDisplay value={sensorData.pressure} label="pressure" />
               </div>
@@ -217,7 +217,7 @@ const MarsDashboard = () => {
             
             <div className="flex justify-between items-center flex-grow gap-2 h-full px-2">
               
-              <div className="flex flex-col items-center justify-center flex-1">
+              <div className="flex flex-col items-center justify-center flex-1 -ml-4">
                 <OdometerGauge 
                   value={sensorData.tloop} 
                   min={30} 
@@ -230,8 +230,8 @@ const MarsDashboard = () => {
               
               <div className="flex gap-3 h-full justify-end flex-1"> 
                 <div className="flex gap-3 h-full">
-                  <VerticalBarGauge value={sensorData.voltage} min={0} max={800} label="v" fillColor="from-slate-400 to-slate-200" tickCount={5} />
-                  <VerticalBarGauge value={sensorData.ampere} min={0} max={400} label="a" fillColor="from-slate-400 to-slate-200" tickCount={5} />
+                  <VerticalBarGauge value={sensorData.voltage} min={0} max={800} label="voltage" fillColor="from-slate-400 to-slate-200" tickCount={5} />
+                  <VerticalBarGauge value={sensorData.ampere} min={0} max={400} label="ampere" fillColor="from-slate-400 to-slate-200" tickCount={5} />
                 </div>
                 <div className="flex gap-3 h-full pl-3"> 
                   <VerticalBarGauge value={sensorData.production} min={0} max={300} label="pro" fillColor="from-emerald-400 to-green-400" tickCount={5} />

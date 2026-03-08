@@ -36,6 +36,7 @@ The core of the system is a Rule Engine that evaluates incoming normalized event
 * **US18:** As an Administrator, I want to view the status of the `airlock` to coordinate activities safely.
 * **US19:** As an Administrator, I want to monitor `radiation` levels to allow the return of personnel who are outside.
 * **US20:** As an Administrator, I want to be able to deactivate automation rules to take manual control.
+* **US21:** As an Administrator, I want to be able to deactivate any of the automation rules to take manual control over the paramaters.
 
 ## 3. Standard Event Schema
 To process heterogeneous data (REST arrays, scalar objects, Telemetry streams) uniformly, all incoming data is mapped to a `Standard Event Schema` before entering the Rule Engine.
