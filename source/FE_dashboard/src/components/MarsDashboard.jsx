@@ -67,9 +67,23 @@ const formatHistoryTimestamp = (timestamp) => {
   }).format(date);
 };
 
+const formatFocusValue = (value, unit = '') => {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return 'N/A';
+  }
+
+  if (typeof value === 'number') {
+    const decimals = Number.isInteger(value) ? 0 : value < 10 ? 2 : 1;
+    return `${value.toFixed(decimals)}${unit}`;
+  }
+
+  return `${value}${unit}`;
+};
+
 const MarsDashboard = () => {
   const [manualError, setManualError] = useState('');
   const [isRuleManagerOpen, setIsRuleManagerOpen] = useState(false);
+  const [focusedZone, setFocusedZone] = useState(null);
 
   const { sensorData, rules: backendRules, history, actuators, sendActuatorCommand } = useMarsData();
   const { rules: managedRules, handleSaveRule, handleDeleteRule, handleToggleRule, isAuto, handleModeToggle } = useRules(backendRules);
@@ -82,6 +96,9 @@ const MarsDashboard = () => {
       acc[rule.target] = evaluateRule(observedValue, rule.operator, rule.threshold);
       return acc;
     }, {});
+  const currentOxygen = sensorData.oxygen_history?.length
+    ? sensorData.oxygen_history[sensorData.oxygen_history.length - 1]
+    : null;
 
   const actuatorMap = { coolingFan: 'cooling_fan', habitatHeater: 'habitat_heater', entranceHumidifier: 'entrance_humidifier', hallVentilation: 'hall_ventilation' };
 
@@ -96,6 +113,96 @@ const MarsDashboard = () => {
         setManualError('Manual override non riuscito');
       }
     }
+  };
+
+  const renderFocusedZoneModal = () => {
+    if (!focusedZone) {
+      return null;
+    }
+
+    const zoneDetails = {
+      greenhouse: {
+        title: 'Greenhouse',
+        subtitle: 'Thermal and cultivation analysis',
+        accent: 'emerald',
+        metrics: [
+          { label: 'Temperature', value: formatFocusValue(sensorData.greenhouse_temp, ' °C') },
+          { label: 'Water Level', value: formatFocusValue(sensorData.water_level, '%') },
+          { label: 'pH', value: formatFocusValue(sensorData.ph) },
+          { label: 'Alert', value: activeAlerts[ALERT_TARGETS.greenhousePh] ? 'ON' : 'OFF' },
+        ],
+      },
+      habitat: {
+        title: 'Habitat',
+        subtitle: 'Environmental and life support analysis',
+        accent: 'amber',
+        metrics: [
+          { label: 'CO2', value: formatFocusValue(sensorData.co2, ' ppm') },
+          { label: 'Pressure', value: formatFocusValue(sensorData.pressure, ' kPa') },
+          { label: 'Humidity', value: formatFocusValue(sensorData.humidity, '%') },
+          { label: 'PM2.5', value: formatFocusValue(sensorData.pm25, ' ug/m3') },
+          { label: 'O2', value: formatFocusValue(currentOxygen, '%') },
+        ],
+      },
+      airlock: {
+        title: 'Airlock',
+        subtitle: 'Cycle and radiation analysis',
+        accent: 'cyan',
+        metrics: [
+          { label: 'Radiation', value: formatFocusValue(sensorData.radiation) },
+          { label: 'Cycles/Hour', value: formatFocusValue(sensorData.airlock_cycles) },
+          { label: 'Door D', value: sensorData.statusD ? 'ON' : 'OFF' },
+          { label: 'Door P', value: sensorData.statusP ? 'ON' : 'OFF' },
+          { label: 'Door I', value: sensorData.statusI ? 'ON' : 'OFF' },
+          { label: 'Alert', value: activeAlerts[ALERT_TARGETS.airlockCycles] ? 'ON' : 'OFF' },
+        ],
+      },
+      power: {
+        title: 'Power',
+        subtitle: 'Electrical and thermal load analysis',
+        accent: 'rose',
+        metrics: [
+          { label: 'Thermal Loop', value: formatFocusValue(sensorData.tloop, ' °C') },
+          { label: 'Voltage', value: formatFocusValue(sensorData.voltage, ' V') },
+          { label: 'Current', value: formatFocusValue(sensorData.ampere, ' A') },
+          { label: 'Production', value: formatFocusValue(sensorData.production, ' kW') },
+          { label: 'Consumption', value: formatFocusValue(sensorData.consumption, ' kW') },
+        ],
+      },
+    };
+
+    const zone = zoneDetails[focusedZone];
+    if (!zone) {
+      return null;
+    }
+
+    return (
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/85 p-6">
+        <div className="w-full max-w-5xl rounded-[34px] border border-slate-700 bg-slate-950 shadow-[0_24px_90px_rgba(0,0,0,0.65)]">
+          <div className="flex items-center justify-between gap-4 border-b border-slate-800 px-7 py-6">
+            <div>
+              <div className="text-2xl font-black uppercase tracking-[0.24em] text-white">{zone.title}</div>
+              <div className="mt-2 text-xs uppercase tracking-[0.22em] text-slate-500">{zone.subtitle}</div>
+            </div>
+            <button
+              onClick={() => setFocusedZone(null)}
+              className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-300"
+            >
+              Close
+            </button>
+          </div>
+
+          <div className="grid gap-3 p-7 sm:grid-cols-2 xl:grid-cols-3">
+              {zone.metrics.map((metric) => (
+                <div key={metric.label} className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-4">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">{metric.label}</div>
+                  <div className="mt-3 text-2xl font-black text-white">{metric.value}</div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -134,7 +241,7 @@ const MarsDashboard = () => {
           <div className="relative grid grid-cols-2 grid-rows-2 gap-6 h-[600px]">
           
           {/* 1. GREENHOUSE */}
-          <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-emerald-500/45 p-4 flex flex-col shadow-lg relative">
+          <div onClick={() => setFocusedZone('greenhouse')} className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-emerald-500/45 p-4 flex flex-col shadow-lg relative cursor-pointer transition-transform duration-150 hover:-translate-y-1">
             <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-full bg-slate-900/95 px-2 py-0.5">
               <span className="text-[8px] font-bold uppercase tracking-[0.14em] text-emerald-300">PH Alert</span>
               <div className="scale-[0.88] translate-y-[1px]">
@@ -159,7 +266,7 @@ const MarsDashboard = () => {
           </div>
           
          {/* 2. HABITAT */}
-          <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-amber-500/45 p-4 flex flex-col shadow-lg relative">
+          <div onClick={() => setFocusedZone('habitat')} className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-amber-500/45 p-4 flex flex-col shadow-lg relative cursor-pointer transition-transform duration-150 hover:-translate-y-1">
             <div className="text-center text-amber-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Habitat</div>
             
             <div className="flex justify-between items-stretch flex-grow h-full gap-1">
@@ -182,7 +289,7 @@ const MarsDashboard = () => {
           </div>
 
           {/* 3. AIRLOCK */}
-          <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-cyan-500/45 p-4 flex flex-col shadow-lg relative">
+          <div onClick={() => setFocusedZone('airlock')} className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-cyan-500/45 p-4 flex flex-col shadow-lg relative cursor-pointer transition-transform duration-150 hover:-translate-y-1">
             <div className="absolute top-3 left-3 z-10 flex items-center gap-1 rounded-full bg-slate-900/95 px-2 py-0.5">
               <span className="text-[8px] font-bold uppercase tracking-[0.14em] text-cyan-300">Cycle Alert</span>
               <div className="scale-[0.88] translate-y-[1px]">
@@ -226,7 +333,7 @@ const MarsDashboard = () => {
           </div>
 
           {/* 4. POWER */}
-          <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-red-500/45 p-4 flex flex-col shadow-lg relative">
+          <div onClick={() => setFocusedZone('power')} className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-red-500/45 p-4 flex flex-col shadow-lg relative cursor-pointer transition-transform duration-150 hover:-translate-y-1">
             <div className="text-center text-red-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Power</div>
             
             <div className="flex justify-between items-center flex-grow gap-2 h-full px-2">
@@ -391,6 +498,8 @@ const MarsDashboard = () => {
         </aside>
       </div>
       </div>
+
+      {focusedZone && renderFocusedZoneModal()}
 
       {isRuleManagerOpen && (
         <RuleManagement 
