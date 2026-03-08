@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { buildConditionKey, getConditionConfigFromRule } from './ruleConfig';
 
-// Sostituisci con l'URL base del tuo backend Presentation (es. se gira su localhost:8000)
 const API_BASE_URL = 'http://localhost:8000';
 
 export const useRules = (backendRules = []) => {
@@ -9,7 +8,6 @@ export const useRules = (backendRules = []) => {
 
   const [isAuto, setIsAuto] = useState(true);
 
-  // NUOVO: Recupera lo stato iniziale dal backend all'avvio
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/system/mode`)
       .then(res => res.json())
@@ -17,12 +15,11 @@ export const useRules = (backendRules = []) => {
       .catch(err => console.error("Errore nel recupero della modalità:", err));
   }, []);
 
-  // Quando arrivano o cambiano le regole dal DB, le mappiamo per la UI
   useEffect(() => {
     const mappedRules = backendRules
       .filter(r => r.action_type !== 'UI_ALERT') 
       .map(r => ({
-        id: r.rule_id,               // Il DB usa rule_id
+        id: r.rule_id,
         conditionKey: buildConditionKey(r.source_name, r.metric_key),
         operator: r.operator,
         value: r.threshold,
@@ -35,16 +32,12 @@ export const useRules = (backendRules = []) => {
     setRules(mappedRules);
   }, [backendRules]);
 
-  // NUOVO: Gestione del Toggle Auto/Manual
   const handleModeToggle = async () => {
-    // 1. Usiamo lo stato "prev" corrente per calcolare il prossimo, 
-    // in modo da non cadere mai in variabili vecchie o bloccate
     const currentMode = isAuto ? 'AUTO' : 'MANUAL';
     const nextMode = isAuto ? 'MANUAL' : 'AUTO';
     
     console.log(`🔄 Cambio richiesto: da ${currentMode} a ${nextMode}`);
 
-    // Aggiornamento UI immediato e garantito
     setIsAuto(!isAuto);
 
     try {
@@ -59,32 +52,26 @@ export const useRules = (backendRules = []) => {
       }
       
       const data = await response.json();
-      console.log(`✅ Il backend conferma di essere in modalità: ${data.mode}`);
-      
-      // Allineiamo l'UI alla verità assoluta del backend
+     
       setIsAuto(data.mode === 'AUTO');
       
     } catch (error) {
       console.error("🚨 Chiamata fallita:", error);
-      // Se fallisce, torniamo al valore di prima
       setIsAuto(currentMode === 'AUTO'); 
     }
   };
 
-  // Gestione Salvataggio (Creazione / Modifica)
   const handleSaveRule = async (newRuleForm) => {
-    // 1. Assicuriamoci che l'ID sia una stringa come richiesto dal DB (es. "rule_171000000")
     const ruleId = typeof newRuleForm.id === 'number' ? `rule_${newRuleForm.id}` : newRuleForm.id;
     const [sourceName, metricKey] = newRuleForm.conditionKey.split('::');
 
-    // 2. Prepariamo il payload per il backend (RuleSchema)
     const payload = {
       rule_id: ruleId,
       description: `Auto Rule: ${sourceName} (${metricKey}) -> ${newRuleForm.actuator}`,
       source_name: sourceName,
       metric_key: metricKey,
       operator: newRuleForm.operator,
-      threshold: newRuleForm.value.toString(), // Il DB lo vuole come stringa
+      threshold: newRuleForm.value.toString(),
       action_type: "ACTUATOR_COMMAND",
       target: newRuleForm.actuator,
       payload: newRuleForm.action,
@@ -92,14 +79,11 @@ export const useRules = (backendRules = []) => {
     };
 
     try {
-      // Se è una modifica e il backend non supporta l'aggiornamento (PUT) dell'intera regola, 
-      // in un hackathon l'approccio più rapido è eliminare la vecchia e creare la nuova!
       const isEditing = typeof newRuleForm.id !== 'number'; 
       if (isEditing) {
         await fetch(`${API_BASE_URL}/api/rules/${newRuleForm.id}`, { method: 'DELETE' });
       }
 
-      // 3. Facciamo la chiamata POST per creare la regola
       const response = await fetch(`${API_BASE_URL}/api/rules`, {
         method: 'POST',
         headers: {
@@ -109,7 +93,6 @@ export const useRules = (backendRules = []) => {
       });
 
       if (response.ok) {
-        // 4. Aggiornamento ottimistico dell'UI
         setRules(prevRules => {
           const exists = prevRules.find(r => r.id === ruleId);
           const uiRule = { ...newRuleForm, id: ruleId, isActive: newRuleForm.isActive ?? true };
@@ -128,16 +111,13 @@ export const useRules = (backendRules = []) => {
     }
   };
 
-  // Funzione per eliminare
   const handleDeleteRule = async (idToDelete) => {
     try {
-      // Chiamata al backend per eliminare
       const response = await fetch(`${API_BASE_URL}/api/rules/${idToDelete}`, { 
         method: 'DELETE' 
       });
 
       if (response.ok) {
-        // Aggiornamento dell'UI
         setRules(prevRules => prevRules.filter(r => r.id !== idToDelete));
         console.log(`Regola ${idToDelete} eliminata con successo.`);
       } else {

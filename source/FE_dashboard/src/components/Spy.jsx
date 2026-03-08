@@ -1,6 +1,3 @@
-// Spy.jsx
-import React from 'react';
-
 const Spy = ({ label, isOn = false }) => {
   return (
     <div className="flex items-center gap-3">

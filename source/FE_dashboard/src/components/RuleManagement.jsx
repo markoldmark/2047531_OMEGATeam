@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ACTUATOR_OPTIONS, CONDITION_OPTIONS, OPERATOR_OPTIONS, getConditionConfig } from '../services/ruleConfig';
 
 const PauseIcon = () => (
@@ -46,13 +46,11 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
     <div className="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 font-sans">
       <div className="bg-slate-900/95 border border-white/10 rounded-[30px] p-8 max-w-3xl w-full shadow-2xl flex flex-col h-[600px]">
         
-        {/* HEADER */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-cyan-400 tracking-[0.2em] uppercase">Rule Manager</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center transition-colors border border-white/5">✕</button>
         </div>
 
-        {/* TABS */}
         <div className="flex gap-4 mb-6 border-b border-white/10 pb-4">
           <button onClick={() => setActiveTab('list')} className={`px-4 py-2 rounded-lg font-semibold text-xs uppercase tracking-widest transition-all ${activeTab === 'list' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50' : 'text-slate-500 hover:text-slate-300'}`}>Rules</button>
           <button onClick={() => {setRuleForm(defaultRule); setEditingId(null); setActiveTab('form');}} className={`px-4 py-2 rounded-lg font-semibold text-xs uppercase tracking-widest transition-all ${activeTab === 'form' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50' : 'text-slate-500 hover:text-slate-300'}`}>
@@ -60,7 +58,6 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
           </button>
         </div>
 
-        {/* CONTENUTO */}
         <div className="flex-grow overflow-y-auto pr-2 overscroll-contain [contain:content] mars-scrollbar">
           
           {activeTab === 'list' && (

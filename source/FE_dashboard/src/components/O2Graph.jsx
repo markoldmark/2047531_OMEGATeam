@@ -35,22 +35,18 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
 
   return (
     <div className="flex flex-col items-center w-full">
-      {/* Contenitore principale: larghezza ridotta da w-[180px] a w-[140px] per dare respiro alle barre laterali */}
       <div className="relative w-[120px] h-[100px]">
-        
-        {/* Sfondo Dark con Griglia */}
+
         <div className="absolute left-8 top-0 right-0 bottom-6 bg-slate-900/60 rounded-tr-xl border border-white/5 shadow-inner z-0 overflow-hidden backdrop-blur-sm">
           {Array.from({ length: 11 }).map((_, i) => (
             <div key={`grid-${i}`} className="absolute w-full h-px bg-white/5" style={{ top: `${(i / 10) * 100}%` }}></div>
           ))}
         </div>
 
-        {/* Asse Y Dark */}
         <div className="absolute left-0 top-0 bottom-6 w-8 border-r border-slate-700 z-10">
           {Array.from({ length: 11 }).map((_, i) => {
             const val = 21.0 - i * 0.1;
             const topPercent = (i / 10) * 100;
-            // Mostra il testo solo per gli indici pari (0=21.0, 2=20.8, 4=20.6, ecc.)
             const showText = i % 2 === 0; 
 
             return (
@@ -66,7 +62,6 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
           })}
         </div>
 
-        {/* Tracciato SVG Vincolato */}
         <div className="absolute left-8 top-0 right-0 bottom-6 z-20 overflow-hidden">
           <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="w-full h-full drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">
             <polyline fill="none" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points={points} />

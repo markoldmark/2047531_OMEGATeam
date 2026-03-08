@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import OdometerGauge from './OdometerGauge';
 import VerticalBarGauge from './VerticalBarGauge';
 import HorizontalBarGauge from './HorizontalBarGauge';

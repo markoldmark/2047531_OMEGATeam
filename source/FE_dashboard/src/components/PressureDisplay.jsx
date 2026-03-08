@@ -1,5 +1,3 @@
-import React from 'react';
-
 const PressureDisplay = ({ value = 0, label = "press" }) => {
   return (
     <div className="flex flex-col items-center scale-75">

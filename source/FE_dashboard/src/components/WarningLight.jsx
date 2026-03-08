@@ -1,6 +1,3 @@
-// WarningLight.jsx
-import React from 'react';
-
 const WarningLight = ({ 
   isOn = true,          
   text = "",             
@@ -14,9 +11,6 @@ const WarningLight = ({
   const shapeClass = shape === "circle" ? "rounded-full" : "rounded-md";
   const currentColor = isOn ? activeColor : inactiveColor;
   const animationClass = (isOn && isBlinking) ? "animate-pulse" : "";
-  
-  // Rimuoviamo classi tailwind dinamiche per l'ombra e usiamo uno style inline se isOn
-  // per assicurarci che il glow corrisponda al colore attivo
   const glowStyle = isOn ? { boxShadow: '0 0 15px currentColor' } : {};
 
   return (

@@ -20,7 +20,6 @@ def get_rabbitmq_channel():
     """Crea la connessione a RabbitMQ e dichiara l'exchange."""
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
     channel = connection.channel()
-    # Usiamo un exchange di tipo 'fanout' (invia a tutte le code collegate)
     channel.exchange_declare(exchange='mars_events', exchange_type='fanout')
     return connection, channel
 
@@ -46,8 +45,7 @@ def normalize_event(sensor_id, raw_data):
 
 def start_polling():
     print(f"Avvio REST Poller. Connessione a RabbitMQ su {RABBITMQ_HOST}...")
-    
-    # Riprova a connettersi a RabbitMQ finché non è pronto (utile all'avvio di Docker)
+
     while True:
         try:
             connection, channel = get_rabbitmq_channel()
@@ -62,10 +60,9 @@ def start_polling():
             raw_data = fetch_sensor_data(sensor)
             if raw_data:
                 event = normalize_event(sensor, raw_data)
-                # Pubblichiamo l'evento sull'exchange
                 channel.basic_publish(
                     exchange='mars_events',
-                    routing_key='', # Non serve con 'fanout'
+                    routing_key='',
                     body=json.dumps(event)
                 )
         

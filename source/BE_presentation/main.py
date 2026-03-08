@@ -76,8 +76,6 @@ rule_history_cache = []
 alert_rules_cache = build_default_alert_rules()
 alert_rule_activation_state = {}
 
-
-# Modello per la validazione delle regole in ingresso
 class RuleSchema(BaseModel):
     rule_id: str
     description: str
@@ -99,7 +97,7 @@ class ActuatorCommand(BaseModel):
     state: str
 
 class SystemMode(BaseModel):
-    mode: str  # "AUTO" o "MANUAL"
+    mode: str
 
 
 def get_db_connection():
@@ -298,7 +296,6 @@ async def notify_rule_change():
 async def startup():
     asyncio.create_task(consume_rabbitmq())
 
-# --- ENDPOINT STATO ---
 @app.get("/api/state")
 async def get_state():
     return latest_state_cache
@@ -487,7 +484,6 @@ async def set_system_mode(payload: SystemMode):
     system_mode = new_mode
     
     if system_mode == "MANUAL":
-        # 1. Trova tutte le regole attive nel DB (Persistenti)
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute("SELECT rule_id FROM automation_rules WHERE is_active = TRUE")
@@ -498,40 +494,31 @@ async def set_system_mode(payload: SystemMode):
         conn.commit()
         cur.close()
         conn.close()
-        
-        # 2. Trova tutti gli Alert attivi (Volatili)
+
         active_alert_rules = [r["rule_id"] for r in alert_rules_cache if r.get("is_active", True)]
         for r in alert_rules_cache:
             if r["rule_id"] in active_alert_rules:
                 r["is_active"] = False
-                # Qui lo mettevi già a False, che è corretto per l'alert cache!
                 alert_rule_activation_state[r["rule_id"]] = False
                 
-        # 3. Salva gli ID di chi abbiamo appena spento
         paused_by_manual = set(active_db_rules + active_alert_rules)
         await notify_rule_change()
         
     else:
-        # TORNIAMO IN AUTO: Riattiviamo solo quelle in paused_by_manual
         if paused_by_manual:
             paused_list = list(paused_by_manual)
-            
-            # Riattiva DB
+
             conn = get_db_connection()
             cur = conn.cursor()
             cur.execute("UPDATE automation_rules SET is_active = TRUE WHERE rule_id = ANY(%s)", (paused_list,))
             conn.commit()
             cur.close()
             conn.close()
-            
-            # Riattiva Alerts
+
             for r in alert_rules_cache:
                 if r["rule_id"] in paused_by_manual:
                     r["is_active"] = True
             
-            # ---> MODIFICA CHIAVE QUI <---
-            # Resettiamo lo stato interno di attivazione di TUTTE le regole (sia DB che Alert)
-            # così che la funzione `should_emit_alert` le veda come "mai attivate"
             for rule_id in paused_by_manual:
                 alert_rule_activation_state[rule_id] = False
                     
@@ -540,24 +527,20 @@ async def set_system_mode(payload: SystemMode):
             
     return {"mode": system_mode}
 
-# --- WEBSOCKET ---
 @app.websocket("/ws/stream")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
 
-    active_connections.add(websocket) # Usa il set dichiarato globalmente
+    active_connections.add(websocket)
 
     try:
         await websocket.send_json({"type": "INIT_STATE", "data": latest_state_cache})
         while True:
-            # Mantieni la connessione aperta ascoltando i messaggi dal frontend
             await websocket.receive_text()
             
     except WebSocketDisconnect:
-        # Gestisci la disconnessione pulita rimuovendo il socket dal set
         active_connections.remove(websocket)
     except Exception as e:
         print(f"Errore imprevisto WebSocket: {e}")
-        # Rimuovi la connessione in caso di altri errori
         if websocket in active_connections:
             active_connections.remove(websocket)

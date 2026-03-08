@@ -9,7 +9,6 @@ import aio_pika
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-# Configurazioni
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "rabbitmq")
 DB_CONFIG = {
     "dbname": "mars_iot_db",
@@ -121,22 +120,18 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
     async with message.process():
         event = json.loads(message.body.decode())
         event_type = event.get("event_type")
-        
-        # 1. Ignora la history dei trigger
+
         if event_type == "RULE_TRIGGER":
             return
-            
-        # 2. Intercetta la notifica dalla Presentation e aggiorna la cache!
+        
         if event_type == "RULE_UPDATED":
             print("[PROCESSOR] 🔄 Ricevuto RULE_UPDATED: Aggiorno la cache delle regole dal DB...")
             APP_STATE["cached_rules"] = fetch_rules()
             return
 
-        # 3. Logica standard per la telemetria (USANDO LA CACHE)
         source = event.get("source_name")
         measurements = event.get("measurements", {})
-        
-        # Iteriamo sulla lista dentro APP_STATE
+
         for rule in APP_STATE["cached_rules"]:
             if rule['source_name'] == source:
                 current_value = extract_metric_value(measurements, rule['metric_key'])

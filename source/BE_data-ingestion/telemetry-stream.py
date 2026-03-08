@@ -49,8 +49,7 @@ async def listen_to_topic(topic, exchange):
                 async for message in websocket:
                     raw_data = json.loads(message)
                     event = normalize_event(topic, raw_data)
-                    
-                    # Pubblica il messaggio asincronamente
+
                     await exchange.publish(
                         aio_pika.Message(body=json.dumps(event).encode()),
                         routing_key=""

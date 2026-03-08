@@ -8,8 +8,6 @@ const INITIAL_ACTUATOR_STATE = {
   hallVentilation: false,
 };
 
-// --- 1. CHIAMATE API (REST) ---
-
 export const fetchRulesAndHistory = async () => {
   try {
     const [rulesRes, historyRes, actuatorsRes] = await Promise.all([
@@ -42,8 +40,6 @@ export const sendActuatorCommand = async (actuatorName, state) => {
   }
   return response.json();
 };
-
-// --- 2. PARSER DEI DATI WEBSOCKET ---
 
 const getInitVal = (cache, source, extractor) => {
   if (cache[source] && cache[source].measurements) {
@@ -119,14 +115,11 @@ const processTelemetryUpdate = (source, data, prev) => {
   } else if (source === 'air_quality_pm25') {
     if (data.pm25_ug_m3 !== undefined) { newData.pm25 = data.pm25_ug_m3; isUpdated = true; }
   } else if (source === 'mars/telemetry/life_support') {
-    // Estraiamo la CO2 (se presente)
     const valCo2 = getMetric(data.measurements, 'co2');
     if (valCo2 !== null && valCo2 !== undefined) { newData.co2 = valCo2; isUpdated = true; }
     
-    // Estraiamo l'ossigeno e aggiorniamo lo storico!
     const valO2 = getMetric(data.measurements, 'oxygen_percent');
     if (valO2 !== null && valO2 !== undefined) { 
-      // Manteniamo gli ultimi 30 valori
       newData.oxygen_history = [...(prev.oxygen_history || []), valO2].slice(-30);
       isUpdated = true; 
     }
@@ -155,8 +148,6 @@ const processTelemetryUpdate = (source, data, prev) => {
 
   return { newData, isUpdated };
 };
-
-// --- 3. L'HOOK PRINCIPALE ---
 
 const INITIAL_SENSOR_STATE = {
   oxygen_history: [],
@@ -212,7 +203,7 @@ export const useMarsData = () => {
       if (message.event_type === 'RULE_UPDATED') {
         console.log("⚡ Ricevuto RULE_UPDATED dal broker! Ricarico le regole...");
         loadData(); 
-        return; // Interrompiamo qui, non serve fare altro per questo messaggio
+        return;
       }
       
       if (message.type === 'INIT_STATE') {
