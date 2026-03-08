@@ -68,22 +68,11 @@ const formatHistoryTimestamp = (timestamp) => {
 };
 
 const MarsDashboard = () => {
-  // Modifica questi due stati:
-  const [isAuto, setIsAuto] = useState(() => {
-    const saved = localStorage.getItem('mars_isAuto');
-    return saved !== null ? JSON.parse(saved) : true;
-  });
-
-  const [pausedByManual, setPausedByManual] = useState(() => {
-    const saved = localStorage.getItem('mars_pausedByManual');
-    return saved !== null ? JSON.parse(saved) : [];
-  });
-
   const [manualError, setManualError] = useState('');
   const [isRuleManagerOpen, setIsRuleManagerOpen] = useState(false);
 
   const { sensorData, rules: backendRules, history, actuators, sendActuatorCommand } = useMarsData();
-  const { rules: managedRules, handleSaveRule, handleDeleteRule, handleToggleRule } = useRules(backendRules);
+  const { rules: managedRules, handleSaveRule, handleDeleteRule, handleToggleRule, isAuto, handleModeToggle } = useRules(backendRules);
 
   const activeAlerts = backendRules
     .filter((rule) => rule.action_type === 'UI_ALERT' && rule.is_active)
@@ -106,31 +95,6 @@ const MarsDashboard = () => {
       } catch (error) {
         setManualError('Manual override non riuscito');
       }
-    }
-  };
-
-  const handleModeToggle = () => {
-    const nextIsAuto = !isAuto;
-    setIsAuto(nextIsAuto);
-    // Salva la nuova modalità (Auto o Manual) nel browser
-    localStorage.setItem('mars_isAuto', JSON.stringify(nextIsAuto));
-
-    if (!nextIsAuto) {
-      // Passaggio a MANUAL
-      const activeRuleIds = managedRules.filter(rule => rule.isActive).map(rule => rule.id);
-      setPausedByManual(activeRuleIds);
-      
-      // Salva l'array degli ID nel browser
-      localStorage.setItem('mars_pausedByManual', JSON.stringify(activeRuleIds));
-      
-      activeRuleIds.forEach(id => handleToggleRule(id, false));
-    } else {
-      // Passaggio ad AUTO
-      pausedByManual.forEach(id => handleToggleRule(id, true));
-      setPausedByManual([]);
-      
-      // Svuota l'array salvato nel browser
-      localStorage.setItem('mars_pausedByManual', JSON.stringify([]));
     }
   };
 

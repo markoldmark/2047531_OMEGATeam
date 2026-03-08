@@ -7,6 +7,16 @@ const API_BASE_URL = 'http://localhost:8000';
 export const useRules = (backendRules = []) => {
   const [rules, setRules] = useState([]);
 
+  const [isAuto, setIsAuto] = useState(true);
+
+  // NUOVO: Recupera lo stato iniziale dal backend all'avvio
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/system/mode`)
+      .then(res => res.json())
+      .then(data => setIsAuto(data.mode === 'AUTO'))
+      .catch(err => console.error("Errore nel recupero della modalità:", err));
+  }, []);
+
   // Quando arrivano o cambiano le regole dal DB, le mappiamo per la UI
   useEffect(() => {
     const mappedRules = backendRules
@@ -24,6 +34,42 @@ export const useRules = (backendRules = []) => {
 
     setRules(mappedRules);
   }, [backendRules]);
+
+  // NUOVO: Gestione del Toggle Auto/Manual
+  const handleModeToggle = async () => {
+    // 1. Usiamo lo stato "prev" corrente per calcolare il prossimo, 
+    // in modo da non cadere mai in variabili vecchie o bloccate
+    const currentMode = isAuto ? 'AUTO' : 'MANUAL';
+    const nextMode = isAuto ? 'MANUAL' : 'AUTO';
+    
+    console.log(`🔄 Cambio richiesto: da ${currentMode} a ${nextMode}`);
+
+    // Aggiornamento UI immediato e garantito
+    setIsAuto(!isAuto);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/system/mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: nextMode })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Errore Server: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log(`✅ Il backend conferma di essere in modalità: ${data.mode}`);
+      
+      // Allineiamo l'UI alla verità assoluta del backend
+      setIsAuto(data.mode === 'AUTO');
+      
+    } catch (error) {
+      console.error("🚨 Chiamata fallita:", error);
+      // Se fallisce, torniamo al valore di prima
+      setIsAuto(currentMode === 'AUTO'); 
+    }
+  };
 
   // Gestione Salvataggio (Creazione / Modifica)
   const handleSaveRule = async (newRuleForm) => {
@@ -126,5 +172,5 @@ export const useRules = (backendRules = []) => {
     }
   };
 
-  return { rules, handleSaveRule, handleDeleteRule, handleToggleRule };
+  return { rules, handleSaveRule, handleDeleteRule, handleToggleRule, isAuto, handleModeToggle };
 };

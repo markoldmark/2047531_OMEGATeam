@@ -31,6 +31,9 @@ DB_CONFIG = {
     "host": "db"
 }
 
+system_mode = "AUTO"
+paused_by_manual = set()
+
 
 def build_default_alert_rules():
     """Inizializza le regole alert non persistenti gestite dal presentation."""
@@ -94,6 +97,9 @@ class RuleStatusUpdate(BaseModel):
 
 class ActuatorCommand(BaseModel):
     state: str
+
+class SystemMode(BaseModel):
+    mode: str  # "AUTO" o "MANUAL"
 
 
 def get_db_connection():
@@ -313,6 +319,11 @@ async def get_rules():
 @app.post("/api/rules")
 async def create_rule(rule: RuleSchema):
     """Crea una regola persistente o un alert volatile in base al tipo azione."""
+    if system_mode == "MANUAL" and rule.is_active:
+        rule.is_active = False
+        # Ce la ricordiamo per quando torneremo in AUTO
+        paused_by_manual.add(rule.rule_id)
+
     if rule.action_type == "UI_ALERT":
         timestamp = datetime.now(timezone.utc).isoformat()
         created_rule = {
@@ -457,6 +468,70 @@ async def manual_override_actuator(actuator_name: str, command: ActuatorCommand)
         "state": normalized_state,
         "simulator_response": simulator_response,
     }
+
+@app.get("/api/system/mode")
+async def get_system_mode():
+    return {"mode": system_mode}
+
+@app.post("/api/system/mode")
+async def set_system_mode(payload: SystemMode):
+    global system_mode, paused_by_manual
+    new_mode = payload.mode.upper()
+    
+    if new_mode not in ["AUTO", "MANUAL"]:
+        raise HTTPException(status_code=400, detail="Mode must be AUTO or MANUAL")
+        
+    if new_mode == system_mode:
+        return {"mode": system_mode}
+        
+    system_mode = new_mode
+    
+    if system_mode == "MANUAL":
+        # 1. Trova tutte le regole attive nel DB (Persistenti)
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("SELECT rule_id FROM automation_rules WHERE is_active = TRUE")
+        active_db_rules = [r["rule_id"] for r in cur.fetchall()]
+        
+        if active_db_rules:
+            cur.execute("UPDATE automation_rules SET is_active = FALSE WHERE rule_id = ANY(%s)", (active_db_rules,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        # 2. Trova tutti gli Alert attivi (Volatili)
+        active_alert_rules = [r["rule_id"] for r in alert_rules_cache if r.get("is_active", True)]
+        for r in alert_rules_cache:
+            if r["rule_id"] in active_alert_rules:
+                r["is_active"] = False
+                alert_rule_activation_state[r["rule_id"]] = False
+                
+        # 3. Salva gli ID di chi abbiamo appena spento
+        paused_by_manual = set(active_db_rules + active_alert_rules)
+        await notify_rule_change()
+        
+    else:
+        # TORNIAMO IN AUTO: Riattiviamo solo quelle in paused_by_manual
+        if paused_by_manual:
+            paused_list = list(paused_by_manual)
+            
+            # Riattiva DB
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("UPDATE automation_rules SET is_active = TRUE WHERE rule_id = ANY(%s)", (paused_list,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            # Riattiva Alerts
+            for r in alert_rules_cache:
+                if r["rule_id"] in paused_by_manual:
+                    r["is_active"] = True
+                    
+            paused_by_manual.clear()
+            await notify_rule_change()
+            
+    return {"mode": system_mode}
 
 # --- WEBSOCKET ---
 @app.websocket("/ws/stream")

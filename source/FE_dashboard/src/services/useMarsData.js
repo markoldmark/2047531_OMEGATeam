@@ -209,6 +209,12 @@ export const useMarsData = () => {
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
 
+      if (message.event_type === 'RULE_UPDATED') {
+        console.log("⚡ Ricevuto RULE_UPDATED dal broker! Ricarico le regole...");
+        loadData(); 
+        return; // Interrompiamo qui, non serve fare altro per questo messaggio
+      }
+      
       if (message.type === 'INIT_STATE') {
         setSensorData(prev => processInitState(message.data, prev));
       } 
