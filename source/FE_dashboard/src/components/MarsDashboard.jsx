@@ -100,16 +100,27 @@ const MarsDashboard = () => {
   };
 
   return (
-    // Sfondo principale grigio molto scuro ma solido
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-8 font-sans">
-      
+    <div className="min-h-screen relative overflow-hidden bg-[#070b12] text-slate-100 flex items-center justify-center p-8 font-sans">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(125,211,252,0.14),_transparent_28%),linear-gradient(180deg,_#08111b_0%,_#070b12_52%,_#160d0a_100%)]" aria-hidden="true" />
+      <div className="absolute inset-x-0 top-0 h-[42vh] bg-[radial-gradient(circle_at_50%_0%,_rgba(255,255,255,0.08),_transparent_58%)]" aria-hidden="true" />
+      <div className="absolute inset-x-0 bottom-[-8vh] h-[34vh] rounded-[100%] bg-[#6f2a16]/60 blur-3xl" aria-hidden="true" />
+      <div className="absolute inset-x-0 bottom-0 h-[26vh] bg-gradient-to-t from-[#2a140c] via-[#6b2b19]/55 to-transparent" aria-hidden="true" />
+
+      <div className="relative w-full max-w-[1480px]">
+        <div className="mb-5 flex items-center justify-between px-2">
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-[0.34em] text-orange-300/90">Mars Habitat Command</div>
+            <div className="mt-1 text-sm uppercase tracking-[0.18em] text-slate-300/70">Operations Deck</div>
+          </div>
+        </div>
+
       <div className="w-full max-w-[1450px] grid xl:grid-cols-[minmax(0,1fr)_360px] gap-6">
-        <div className="bg-slate-950 rounded-[40px] p-6 shadow-2xl border-2 border-slate-700 flex flex-col gap-6">
+        <div className="bg-slate-950/78 backdrop-blur-md rounded-[40px] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.58)] border border-slate-600/70 ring-1 ring-white/5 flex flex-col gap-6">
           
           <div className="relative grid grid-cols-2 grid-rows-2 gap-6 h-[600px]">
           
           {/* 1. GREENHOUSE */}
-          <div className="bg-slate-800 rounded-[30px] border-2 border-emerald-500/50 p-4 flex flex-col shadow-lg relative">
+          <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-emerald-500/45 p-4 flex flex-col shadow-lg relative">
             <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-slate-900/95 border border-emerald-500/20 px-2.5 py-1">
               <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-emerald-300">PH Alert</span>
               <div className="scale-90">
@@ -134,7 +145,7 @@ const MarsDashboard = () => {
           </div>
           
          {/* 2. HABITAT */}
-          <div className="bg-slate-800 rounded-[30px] border-2 border-amber-500/50 p-4 flex flex-col shadow-lg relative">
+          <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-amber-500/45 p-4 flex flex-col shadow-lg relative">
             <div className="text-center text-amber-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Habitat</div>
             
             <div className="flex justify-between items-stretch flex-grow h-full gap-2">
@@ -157,7 +168,7 @@ const MarsDashboard = () => {
           </div>
 
           {/* 3. AIRLOCK */}
-          <div className="bg-slate-800 rounded-[30px] border-2 border-cyan-500/50 p-4 flex flex-col shadow-lg relative">
+          <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-cyan-500/45 p-4 flex flex-col shadow-lg relative">
             <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-slate-900/95 border border-cyan-500/20 px-2.5 py-1">
               <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-cyan-300">Cycle Alert</span>
               <div className="scale-90">
@@ -201,7 +212,7 @@ const MarsDashboard = () => {
           </div>
 
           {/* 4. POWER */}
-          <div className="bg-slate-800 rounded-[30px] border-2 border-red-500/50 p-4 flex flex-col shadow-lg relative">
+          <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-red-500/45 p-4 flex flex-col shadow-lg relative">
             <div className="text-center text-red-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Power</div>
             
             <div className="flex justify-between items-center flex-grow gap-2 h-full px-2">
@@ -281,7 +292,7 @@ const MarsDashboard = () => {
           {/* BOTTOM BAR */}
           <div className="flex justify-between items-center gap-4 h-16">
 
-            <div className="bg-slate-800 h-full flex-grow rounded-2xl flex items-center justify-center border-2 border-slate-600 shadow-lg relative">
+            <div className="bg-slate-900/80 backdrop-blur-sm h-full flex-grow rounded-2xl flex items-center justify-center border-2 border-slate-600/85 shadow-lg relative">
               <span className="text-white font-black text-2xl tracking-[0.3em] uppercase">
                 Dashboard
               </span>
@@ -293,7 +304,7 @@ const MarsDashboard = () => {
               </button>
             </div>
 
-            <div className="bg-slate-800 h-full rounded-2xl w-[30%] px-6 flex items-center justify-center border-2 border-slate-600 shadow-lg gap-4">
+            <div className="bg-slate-900/80 backdrop-blur-sm h-full rounded-2xl w-[30%] px-6 flex items-center justify-center border-2 border-slate-600/85 shadow-lg gap-4">
               <span className={`font-bold text-xl ${!isAuto ? 'text-cyan-400' : 'text-slate-500'}`}>MANUAL</span>
               <div className="w-20 h-10 bg-slate-950 rounded-full p-1 cursor-pointer relative border-2 border-slate-600 shadow-inner" onClick={() => setIsAuto(!isAuto)}>
                 <div className={`w-7 h-7 rounded-full shadow-md transition-transform duration-300 ease-in-out absolute top-1 ${isAuto ? 'translate-x-10 bg-emerald-500' : 'translate-x-0 bg-cyan-500'}`}></div>
@@ -309,7 +320,7 @@ const MarsDashboard = () => {
           )}
         </div>
 
-        <aside className="bg-slate-950 rounded-[40px] p-5 shadow-2xl border-2 border-slate-700 flex flex-col self-start h-[760px] max-h-[calc(100vh-4rem)] overflow-hidden">
+        <aside className="bg-slate-950/78 backdrop-blur-md rounded-[40px] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.58)] border border-slate-600/70 ring-1 ring-white/5 flex flex-col self-start h-[760px] max-h-[calc(100vh-4rem)] overflow-hidden">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <div className="text-white font-black text-lg tracking-[0.2em] uppercase">Action History</div>
@@ -364,6 +375,7 @@ const MarsDashboard = () => {
             ))}
           </div>
         </aside>
+      </div>
       </div>
 
       {isRuleManagerOpen && (
