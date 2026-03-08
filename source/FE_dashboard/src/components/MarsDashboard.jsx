@@ -103,12 +103,19 @@ const MarsDashboard = () => {
     // Sfondo principale grigio molto scuro ma solido
     <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-8 font-sans">
       
-      <div className="bg-slate-950 w-full max-w-6xl rounded-[40px] p-6 shadow-2xl border-2 border-slate-700 flex flex-col gap-6">
-        
-        <div className="relative grid grid-cols-2 grid-rows-2 gap-6 h-[600px]">
+      <div className="w-full max-w-[1450px] grid xl:grid-cols-[minmax(0,1fr)_360px] gap-6">
+        <div className="bg-slate-950 rounded-[40px] p-6 shadow-2xl border-2 border-slate-700 flex flex-col gap-6">
+          
+          <div className="relative grid grid-cols-2 grid-rows-2 gap-6 h-[600px]">
           
           {/* 1. GREENHOUSE */}
           <div className="bg-slate-800 rounded-[30px] border-2 border-emerald-500/50 p-4 flex flex-col shadow-lg relative">
+            <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-slate-900/95 border border-emerald-500/20 px-2.5 py-1">
+              <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-emerald-300">PH Alert</span>
+              <div className="scale-90">
+                <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.greenhousePh])} isBlinking={true} text="!" activeColor="bg-amber-400" inactiveColor="bg-slate-700" />
+              </div>
+            </div>
             <div className="text-center text-emerald-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Greenhouse</div>
             <div className="flex justify-between items-stretch flex-grow gap-6 h-full">
               <div className="flex gap-6 h-full">
@@ -116,9 +123,8 @@ const MarsDashboard = () => {
                 <VerticalBarGauge value={sensorData.water_level} min={0} max={100} label="wlev" unit="%" fillColor="from-cyan-500 to-blue-500" tickCount={5} />
               </div>
               <div className="flex flex-col justify-start items-end align-center w-full">
-                <div className="flex items-baseline justify-between gap-2 w-full">
+                <div className="flex items-baseline justify-start gap-2 w-full">
                   <span className="text-xs font-bold text-emerald-300 uppercase tracking-widest mt-auto ml-2">PH</span>
-                  <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.greenhousePh])} isBlinking={true} text="!" activeColor="bg-amber-400" inactiveColor="bg-slate-700" />
                 </div>
                 <div className="flex flex-row justify-end content-center gap-4 w-full mt-2">
                   <HorizontalBarGauge value={sensorData.ph} min={0} max={14} tickCount={7} label="" fillColor="from-emerald-400 to-teal-500" emptyColor="bg-slate-700" />
@@ -156,6 +162,12 @@ const MarsDashboard = () => {
 
           {/* 3. AIRLOCK */}
           <div className="bg-slate-800 rounded-[30px] border-2 border-cyan-500/50 p-4 flex flex-col shadow-lg relative">
+            <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-slate-900/95 border border-cyan-500/20 px-2.5 py-1">
+              <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-cyan-300">Cycle Alert</span>
+              <div className="scale-90">
+                <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.airlockCycles])} isBlinking={true} text="!" activeColor="bg-amber-400" inactiveColor="bg-slate-700" />
+              </div>
+            </div>
             <div className="text-center text-cyan-400 font-bold text-lg tracking-[0.2em] uppercase mb-6">Airlock</div>
             <div className="grid grid-cols-2 gap-4 flex-grow items-center">
               <div className="flex flex-col items-center justify-center">
@@ -169,8 +181,7 @@ const MarsDashboard = () => {
               <div className="col-span-2 mt-2 pt-4 border-t-2 border-slate-600">
                 <div className="flex flex-col items-center gap-2 w-full">
                   <div className="flex items-center gap-4 w-full justify-center">
-                    <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.airlockCycles])} text="!" activeColor="bg-amber-400" inactiveColor="bg-slate-700" />
-                    <div className="flex-grow max-w-[80%]">
+                    <div className="flex-grow max-w-[88%]">
                       <HorizontalBarGauge value={sensorData.airlock_cycles} min={0} max={20} label="cycles" fillColor="from-cyan-400 to-blue-500" emptyColor="bg-slate-700" />
                     </div>
                   </div>
@@ -203,6 +214,9 @@ const MarsDashboard = () => {
 
           {/* CENTER ACTUATORS */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900 p-4 rounded-[30px] border-4 border-slate-700 shadow-2xl z-20">
+            {isAuto && (
+              <div className="absolute inset-0 rounded-[24px] bg-slate-950/18 border border-slate-700/55 pointer-events-none" />
+            )}
             <div className="grid grid-cols-2 gap-3 w-[300px] h-[200px]">
               {['coolingFan', 'habitatHeater', 'entranceHumidifier', 'hallVentilation'].map((act) => (
                 <button 
@@ -212,8 +226,9 @@ const MarsDashboard = () => {
                     actuators[act] 
                       ? 'bg-cyan-600 border-cyan-400 text-white shadow-[0_0_15px_rgba(8,145,178,0.8)]' 
                       : 'bg-slate-800 border-slate-600 text-slate-400 hover:bg-slate-700'
-                  }`} 
+                  } ${isAuto ? 'pointer-events-none cursor-not-allowed opacity-75 saturate-75' : 'cursor-pointer'}`} 
                   disabled={isAuto}
+                  aria-disabled={isAuto}
                 >
                   {act.replace(/([A-Z])/g, ' $1').toUpperCase()}
                 </button>
@@ -222,89 +237,95 @@ const MarsDashboard = () => {
           </div>
         </div>
 
-        {/* BOTTOM BAR */}
-        <div className="flex justify-between items-center gap-4 h-16">
-          <div className="bg-slate-800 h-full rounded-2xl w-[30%] px-8 flex items-center justify-center border-2 border-slate-600 shadow-lg">
-            <span className="text-white font-mono text-xl tracking-widest">H:1-2-1</span>
-          </div>
-
-          <div className="bg-slate-800 h-full flex-grow rounded-2xl flex items-center justify-center border-2 border-slate-600 shadow-lg relative">
-            <span className="text-white font-black text-2xl tracking-[0.3em] uppercase">
-              Dashboard
-            </span>
-            <button 
-              onClick={() => setIsRuleManagerOpen(true)}
-              className="absolute right-4 text-white bg-cyan-700 hover:bg-cyan-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow-md transition-colors"
-            >
-              <OperationsIcon />
-            </button>
-          </div>
-
-          <div className="bg-slate-800 h-full rounded-2xl w-[30%] px-6 flex items-center justify-center border-2 border-slate-600 shadow-lg gap-4">
-            <span className={`font-bold text-xl ${!isAuto ? 'text-cyan-400' : 'text-slate-500'}`}>MANUAL</span>
-            <div className="w-20 h-10 bg-slate-950 rounded-full p-1 cursor-pointer relative border-2 border-slate-600 shadow-inner" onClick={() => setIsAuto(!isAuto)}>
-              <div className={`w-7 h-7 rounded-full shadow-md transition-transform duration-300 ease-in-out absolute top-1 ${isAuto ? 'translate-x-10 bg-emerald-500' : 'translate-x-0 bg-cyan-500'}`}></div>
+          {/* BOTTOM BAR */}
+          <div className="flex justify-between items-center gap-4 h-16">
+            <div className="bg-slate-800 h-full rounded-2xl w-[30%] px-8 flex items-center justify-center border-2 border-slate-600 shadow-lg">
+              <span className="text-white font-mono text-xl tracking-widest">H:1-2-1</span>
             </div>
-            <span className={`font-bold text-xl ${isAuto ? 'text-emerald-400' : 'text-slate-500'}`}>AUTO</span>
+
+            <div className="bg-slate-800 h-full flex-grow rounded-2xl flex items-center justify-center border-2 border-slate-600 shadow-lg relative">
+              <span className="text-white font-black text-2xl tracking-[0.3em] uppercase">
+                Dashboard
+              </span>
+              <button 
+                onClick={() => setIsRuleManagerOpen(true)}
+                className="absolute right-4 text-white bg-cyan-700 hover:bg-cyan-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow-md transition-colors"
+              >
+                <OperationsIcon />
+              </button>
+            </div>
+
+            <div className="bg-slate-800 h-full rounded-2xl w-[30%] px-6 flex items-center justify-center border-2 border-slate-600 shadow-lg gap-4">
+              <span className={`font-bold text-xl ${!isAuto ? 'text-cyan-400' : 'text-slate-500'}`}>MANUAL</span>
+              <div className="w-20 h-10 bg-slate-950 rounded-full p-1 cursor-pointer relative border-2 border-slate-600 shadow-inner" onClick={() => setIsAuto(!isAuto)}>
+                <div className={`w-7 h-7 rounded-full shadow-md transition-transform duration-300 ease-in-out absolute top-1 ${isAuto ? 'translate-x-10 bg-emerald-500' : 'translate-x-0 bg-cyan-500'}`}></div>
+              </div>
+              <span className={`font-bold text-xl ${isAuto ? 'text-emerald-400' : 'text-slate-500'}`}>AUTO</span>
+            </div>
           </div>
+
+          {manualError && (
+            <div className="bg-rose-900 border-2 border-rose-500 text-white rounded-2xl px-4 py-3 text-sm font-bold">
+              {manualError}
+            </div>
+          )}
         </div>
 
-        {manualError && (
-          <div className="bg-rose-900 border-2 border-rose-500 text-white rounded-2xl px-4 py-3 text-sm font-bold">
-            {manualError}
+        <aside className="bg-slate-950 rounded-[40px] p-5 shadow-2xl border-2 border-slate-700 flex flex-col self-start h-[760px] max-h-[calc(100vh-4rem)] overflow-hidden">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <div className="text-white font-black text-lg tracking-[0.2em] uppercase">Action History</div>
+              <div className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-500 mt-1">Control Feed</div>
+            </div>
+            <div className="text-[10px] font-bold tracking-[0.25em] uppercase text-cyan-400">
+              Live
+            </div>
           </div>
-        )}
 
-        {/* HISTORY SECTION */}
-        <div className="grid grid-cols-2 gap-6 mt-2">
-          <div className="bg-slate-800 rounded-[30px] p-5 border-2 border-slate-600 shadow-lg min-h-[220px]">
-            <div className="text-white font-black text-lg tracking-[0.2em] uppercase mb-4">Action History</div>
-            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2">
-              {history.length === 0 && (
-                <div className="text-sm text-slate-400 font-semibold italic">No trigger history yet</div>
-              )}
-              {history.map((item) => (
-                <div key={item.id} className="rounded-xl p-4 border border-slate-600 bg-slate-900/90">
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex flex-wrap items-center gap-2 min-w-0">
-                      <span className={`text-[10px] font-black px-2 py-1 rounded-full tracking-widest uppercase ${
-                        item.action_type === 'UI_ALERT'
-                          ? 'text-amber-300 bg-amber-500/10 border border-amber-500/30'
-                          : 'text-emerald-300 bg-emerald-500/10 border border-emerald-500/30'
-                      }`}>
-                        {item.action_type === 'UI_ALERT' ? 'Alert' : 'Actuator'}
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-mono font-bold shrink-0">
-                      {formatHistoryTimestamp(item.event_timestamp)}
+          <div className="flex flex-col gap-3 overflow-y-auto pr-2 flex-1 min-h-0">
+            {history.length === 0 && (
+              <div className="text-sm text-slate-400 font-semibold italic">No trigger history yet</div>
+            )}
+            {history.map((item) => (
+              <div key={item.id} className="rounded-xl p-4 border border-slate-600 bg-slate-900/90">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex flex-wrap items-center gap-2 min-w-0">
+                    <span className={`text-[10px] font-black px-2 py-1 rounded-full tracking-widest uppercase ${
+                      item.action_type === 'UI_ALERT'
+                        ? 'text-amber-300 bg-amber-500/10 border border-amber-500/30'
+                        : 'text-emerald-300 bg-emerald-500/10 border border-emerald-500/30'
+                    }`}>
+                      {item.action_type === 'UI_ALERT' ? 'Alert' : 'Actuator'}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-mono font-bold shrink-0">
+                    {formatHistoryTimestamp(item.event_timestamp)}
+                  </div>
+                </div>
+
+                <div className="grid gap-2 text-sm">
+                  <div className="rounded-lg bg-slate-800/70 px-3 py-2">
+                    <div className="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Trigger</div>
+                    <div className="text-slate-100 font-semibold break-words">
+                      {item.source_name}
+                      <span className="text-slate-400"> ({item.metric_key})</span>
+                      <span className="text-amber-300"> = {item.observed_value}</span>
                     </div>
                   </div>
 
-                  <div className="grid gap-2 text-sm">
-                    <div className="rounded-lg bg-slate-800/70 px-3 py-2">
-                      <div className="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Trigger</div>
-                      <div className="text-slate-100 font-semibold break-words">
-                        {item.source_name}
-                        <span className="text-slate-400"> ({item.metric_key})</span>
-                        <span className="text-amber-300"> = {item.observed_value}</span>
-                      </div>
-                    </div>
-
-                    <div className="rounded-lg bg-slate-800/70 px-3 py-2">
-                      <div className="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Action</div>
-                      <div className={`font-black break-words ${
-                        item.action_type === 'UI_ALERT' ? 'text-amber-300' : 'text-emerald-300'
-                      }`}>
-                        {formatHistoryAction(item)}
-                      </div>
+                  <div className="rounded-lg bg-slate-800/70 px-3 py-2">
+                    <div className="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Action</div>
+                    <div className={`font-black break-words ${
+                      item.action_type === 'UI_ALERT' ? 'text-amber-300' : 'text-emerald-300'
+                    }`}>
+                      {formatHistoryAction(item)}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        </div>
-
+        </aside>
       </div>
 
       {isRuleManagerOpen && (
