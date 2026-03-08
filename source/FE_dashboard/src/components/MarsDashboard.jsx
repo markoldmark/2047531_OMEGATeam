@@ -130,8 +130,8 @@ const MarsDashboard = () => {
             <div className="text-center text-emerald-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Greenhouse</div>
             <div className="flex justify-between items-stretch flex-grow gap-6 h-full">
               <div className="flex gap-6 h-full">
-                <VerticalBarGauge value={sensorData.greenhouse_temp} min={10} max={35} label="temp" unit="°C" fillColor="from-rose-500 to-orange-400" tickCount={8} />
-                <VerticalBarGauge value={sensorData.water_level} min={0} max={100} label="wlev" unit="%" fillColor="from-cyan-500 to-blue-500" tickCount={5} />
+                <VerticalBarGauge value={sensorData.greenhouse_temp} min={10} max={35} label="temp" unit="°C" fillColor="from-orange-400 to-rose-500" tickCount={8} />
+                <VerticalBarGauge value={sensorData.water_level} min={0} max={100} label="wlev" unit="%" fillColor="from-blue-400 to-blue-700" tickCount={5} />
               </div>
               <div className="flex flex-col justify-start items-end align-center w-full">
                 <div className="flex items-baseline justify-start gap-2 w-full">
@@ -220,8 +220,8 @@ const MarsDashboard = () => {
               <div className="flex flex-col items-center justify-center flex-1">
                 <OdometerGauge 
                   value={sensorData.tloop} 
-                  min={10} 
-                  max={55} 
+                  min={30} 
+                  max={60} 
                   label="tloop" 
                   needleColor="bg-red-500" 
                   scale={1.15} 
