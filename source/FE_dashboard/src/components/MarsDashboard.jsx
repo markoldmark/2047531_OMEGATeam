@@ -121,9 +121,9 @@ const MarsDashboard = () => {
           
           {/* 1. GREENHOUSE */}
           <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-emerald-500/45 p-4 flex flex-col shadow-lg relative">
-            <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-slate-900/95 border border-emerald-500/20 px-2.5 py-1">
-              <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-emerald-300">PH Alert</span>
-              <div className="scale-90">
+            <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-full bg-slate-900/95 px-2 py-0.5">
+              <span className="text-[8px] font-bold uppercase tracking-[0.14em] text-emerald-300">PH Alert</span>
+              <div className="scale-[0.88] translate-y-[1px]">
                 <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.greenhousePh])} isBlinking={true} text="!" activeColor="bg-amber-400" inactiveColor="bg-slate-700" />
               </div>
             </div>
@@ -169,9 +169,9 @@ const MarsDashboard = () => {
 
           {/* 3. AIRLOCK */}
           <div className="bg-slate-900/80 backdrop-blur-sm rounded-[30px] border-2 border-cyan-500/45 p-4 flex flex-col shadow-lg relative">
-            <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-slate-900/95 border border-cyan-500/20 px-2.5 py-1">
-              <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-cyan-300">Cycle Alert</span>
-              <div className="scale-90">
+            <div className="absolute top-3 left-3 z-10 flex items-center gap-1 rounded-full bg-slate-900/95 px-2 py-0.5">
+              <span className="text-[8px] font-bold uppercase tracking-[0.14em] text-cyan-300">Cycle Alert</span>
+              <div className="scale-[0.88] translate-y-[1px]">
                 <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.airlockCycles])} isBlinking={true} text="!" activeColor="bg-amber-400" inactiveColor="bg-slate-700" />
               </div>
             </div>
