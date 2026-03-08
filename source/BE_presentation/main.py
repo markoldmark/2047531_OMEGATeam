@@ -23,7 +23,7 @@ app.add_middleware(
 
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "rabbitmq")
 SIMULATOR_URL = os.getenv("SIMULATOR_URL", "http://simulator:8080")
-MAX_RULE_HISTORY = 50
+MAX_RULE_HISTORY = 20
 DB_CONFIG = {
     "dbname": "mars_iot_db",
     "user": "mars_user",

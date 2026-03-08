@@ -100,13 +100,13 @@ const MarsDashboard = () => {
   };
 
   return (
-    <div className="min-h-[100%] relative overflow-hidden bg-[#070b12] text-slate-100 flex items-center justify-center p-8 font-sans">
+    <div className="min-h-screen w-full relative overflow-hidden bg-[#070b12] text-slate-100 font-sans">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(125,211,252,0.14),_transparent_28%),linear-gradient(180deg,_#08111b_0%,_#070b12_52%,_#160d0a_100%)]" aria-hidden="true" />
       <div className="absolute inset-x-0 top-0 h-[42vh] bg-[radial-gradient(circle_at_50%_0%,_rgba(255,255,255,0.08),_transparent_58%)]" aria-hidden="true" />
       <div className="absolute inset-x-0 bottom-[-8vh] h-[34vh] rounded-[100%] bg-[#6f2a16]/60 blur-3xl" aria-hidden="true" />
       <div className="absolute inset-x-0 bottom-0 h-[26vh] bg-gradient-to-t from-[#2a140c] via-[#6b2b19]/55 to-transparent" aria-hidden="true" />
 
-      <div className="relative w-full max-w-[1480px]">
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1480px] flex-col justify-center px-8 py-8">
         <div className="mb-5 flex items-center justify-between px-2">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-[0.34em] text-orange-300/90">Mars Habitat Command</div>
