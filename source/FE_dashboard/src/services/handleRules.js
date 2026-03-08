@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { buildConditionKey, getConditionConfigFromRule } from './ruleConfig';
 
 // Sostituisci con l'URL base del tuo backend Presentation (es. se gira su localhost:8000)
-const API_BASE_URL = 'http://localhost:8000'; 
+const API_BASE_URL = 'http://localhost:8000';
 
 export const useRules = (backendRules = []) => {
   const [rules, setRules] = useState([]);
