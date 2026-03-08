@@ -214,7 +214,7 @@ const MarsDashboard = () => {
 
           {/* CENTER ACTUATORS */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-950 p-6 rounded-[30px] border-4 border-slate-700 shadow-2xl z-20">
-            <div className="grid grid-cols-2 gap-5 w-[300px] h-[200px]">
+            <div className="grid grid-cols-2 gap-5 w-[250px] h-[150px]">
               {['coolingFan', 'habitatHeater', 'entranceHumidifier', 'hallVentilation'].map((act) => (
                 <button 
                   key={act}
@@ -224,7 +224,7 @@ const MarsDashboard = () => {
                     rounded-xl font-bold text-center text-xs tracking-wider h-full transition-all duration-150 outline-none
                     ${actuators[act] 
                       /* STATO ACCESO (ON) - Scende di 10px (per coprire l'ombra), si rimpicciolisce al 97% e perde l'ombra */
-                      ? 'bg-red-500 text-white translate-y-[6px] scale-[0.90] shadow-none' 
+                      ? 'bg-red-500 text-black translate-y-[6px] scale-[0.90] shadow-none' 
                       /* STATO SPENTO (OFF) - Alzato: faccia red-500, spessore 10px scuro (#930b0b). 
                         Aggiunto active:scale-[0.97] per quando lo clicchi col mouse! */
                       : 'bg-red-500 text-black shadow-[0_6px_0_#930b0b] hover:translate-y-[6px] hover:shadow-none active:translate-y-[6px] active:scale-[0.90] active:shadow-none'
@@ -240,9 +240,6 @@ const MarsDashboard = () => {
 
           {/* BOTTOM BAR */}
           <div className="flex justify-between items-center gap-4 h-16">
-            <div className="bg-slate-800 h-full rounded-2xl w-[30%] px-8 flex items-center justify-center border-2 border-slate-600 shadow-lg">
-              <span className="text-white font-mono text-xl tracking-widest">H:1-2-1</span>
-            </div>
 
             <div className="bg-slate-800 h-full flex-grow rounded-2xl flex items-center justify-center border-2 border-slate-600 shadow-lg relative">
               <span className="text-white font-black text-2xl tracking-[0.3em] uppercase">
