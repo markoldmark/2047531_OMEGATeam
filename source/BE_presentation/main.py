@@ -262,6 +262,28 @@ async def consume_rabbitmq():
             print(f"Errore Broker Presentation: {e}")
             await asyncio.sleep(5)
 
+async def notify_rule_change():
+    """Invia un messaggio broadcast per notificare al processing di aggiornare le regole."""
+    try:
+        connection = await aio_pika.connect_robust(f"amqp://guest:guest@{RABBITMQ_HOST}/")
+        async with connection:
+            channel = await connection.channel()
+            exchange = await channel.declare_exchange('mars_events', aio_pika.ExchangeType.FANOUT)
+            
+            payload = {
+                "event_type": "RULE_UPDATED",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await exchange.publish(
+                aio_pika.Message(body=json.dumps(payload).encode()),
+                routing_key=""
+            )
+            print("[PRESENTATION] Notifica RULE_UPDATED inviata al broker.")
+    except Exception as e:
+        print(f"[PRESENTATION] Errore nell'invio della notifica: {e}")
+
+
 @app.on_event("startup")
 async def startup():
     asyncio.create_task(consume_rabbitmq())
@@ -306,6 +328,9 @@ async def create_rule(rule: RuleSchema):
         }
         alert_rules_cache.append(created_rule)
         alert_rule_activation_state[rule.rule_id] = False
+
+        await notify_rule_change()
+
         return created_rule
 
     conn = get_db_connection()
@@ -336,6 +361,9 @@ async def create_rule(rule: RuleSchema):
         created_rule = cur.fetchone()
         conn.commit()
         cur.close()
+
+        await notify_rule_change()
+
         return created_rule
     finally:
         conn.close()
@@ -350,6 +378,9 @@ async def update_rule(rule_id: str, update: RuleStatusUpdate):
         alert_rule["updated_at"] = datetime.now(timezone.utc).isoformat()
         if not update.is_active:
             alert_rule_activation_state[rule_id] = False
+
+        await notify_rule_change()
+
         return alert_rule
 
     conn = get_db_connection()
@@ -386,10 +417,13 @@ async def delete_rule(rule_id: str):
         cur.close()
         if deleted == 0:
             raise HTTPException(status_code=404, detail="Rule not found")
+        
+        await notify_rule_change()
+
         return {"status": "success", "deleted_id": rule_id}
     finally:
         conn.close()
-        
+
 
 @app.get("/api/history")
 async def get_history(limit: int = Query(default=50, ge=1, le=500)):
