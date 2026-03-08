@@ -35,10 +35,10 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
 
   return (
     <div className="flex flex-col items-center w-full">
-      {/* Contenitore principale con dimensioni fisse per stabilizzare i posizionamenti assoluti */}
-      <div className="relative w-[180px] h-[100px]">
+      {/* Contenitore principale: larghezza ridotta da w-[180px] a w-[140px] per dare respiro alle barre laterali */}
+      <div className="relative w-[140px] h-[100px]">
         
-        {/* Sfondo Dark con Griglia (rientrato a sinistra e in basso per gli assi) */}
+        {/* Sfondo Dark con Griglia */}
         <div className="absolute left-8 top-0 right-0 bottom-6 bg-slate-900/60 rounded-tr-xl border border-white/5 shadow-inner z-0 overflow-hidden backdrop-blur-sm">
           {Array.from({ length: 11 }).map((_, i) => (
             <div key={`grid-${i}`} className="absolute w-full h-px bg-white/5" style={{ top: `${(i / 10) * 100}%` }}></div>
@@ -60,16 +60,14 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
                     {val.toFixed(1)}
                   </span>
                 )}
-                {/* Rende la lineetta leggermente più corta se non è accompagnata dal numero, per un look più pulito */}
                 <div className={`h-[1px] bg-slate-600 ${showText ? 'w-1.5' : 'w-1'}`}></div>
               </div>
             );
           })}
         </div>
 
-        {/* Tracciato SVG Vincolato strettamente sopra la griglia */}
+        {/* Tracciato SVG Vincolato */}
         <div className="absolute left-8 top-0 right-0 bottom-6 z-20 overflow-hidden">
-          {/* preserveAspectRatio="none" fa spalmare la linea esattamente nel box, eliminando l'overflow */}
           <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="w-full h-full drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">
             <polyline fill="none" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points={points} />
           </svg>
