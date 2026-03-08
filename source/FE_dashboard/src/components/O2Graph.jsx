@@ -61,12 +61,6 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
           })}
         </div>
 
-        {/* Asse X Dark */}
-        <div className="absolute left-8 right-0 bottom-0 h-6 border-t border-slate-700 flex justify-between items-start pt-1.5 z-10">
-          <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-widest">-10s</span>
-          <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-widest">0s</span>
-        </div>
-
         {/* Tracciato SVG Vincolato strettamente sopra la griglia */}
         <div className="absolute left-8 top-0 right-0 bottom-6 z-20 overflow-hidden">
           {/* preserveAspectRatio="none" fa spalmare la linea esattamente nel box, eliminando l'overflow */}
@@ -76,7 +70,7 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
         </div>
       </div>
 
-      <div className="text-slate-400 font-semibold text-xs mt-1 uppercase tracking-[0.2em] -mt-2">
+      <div className="text-slate-400 font-semibold text-xs mt-1 uppercase tracking-[0.2em] -mt-4">
         {label}
       </div>
     </div>
