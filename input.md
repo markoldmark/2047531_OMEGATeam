@@ -31,12 +31,11 @@ The core of the system is a Rule Engine that evaluates incoming normalized event
 
 ### Administrator
 * **US15:** As an Administrator, I want to graphically view the habitat oxygen to keep track of the trends.
-* **US16:** As an Administrator, I want to view the history of the warning lights that were on during the session to reconstruct any emergency sequences.
-* **US17:** As an Administrator, I want to monitor the `corridor_pressure` to possibly provide emergency suits.
-* **US18:** As an Administrator, I want to view the status of the `airlock` to coordinate activities safely.
-* **US19:** As an Administrator, I want to monitor `radiation` levels to allow the return of personnel who are outside.
-* **US20:** As an Administrator, I want to be able to deactivate automation rules to take manual control.
-* **US21:** As an Administrator, I want to be able to deactivate any of the automation rules to take manual control over the paramaters.
+* **US16:** As an Administrator, I want to monitor the `corridor_pressure` to possibly provide emergency suits.
+* **US17:** As an Administrator, I want to view the status of the `airlock` to coordinate activities safely.
+* **US18:** As an Administrator, I want to monitor `radiation` levels to allow the return of personnel who are outside.
+* **US19:** As an Administrator, I want to be able to deactivate automation rules to take manual control.
+* **US20:** As an Administrator, I want to be able to deactivate or activate any of the automation rules to take manual control over the paramaters.
 
 ## 3. Standard Event Schema
 To process heterogeneous data (REST arrays, scalar objects, Telemetry streams) uniformly, all incoming data is mapped to a `Standard Event Schema` before entering the Rule Engine.
