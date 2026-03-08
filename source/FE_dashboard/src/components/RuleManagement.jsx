@@ -8,8 +8,30 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule }) => {
   const [ruleForm, setRuleForm] = useState(defaultRule);
 
   // ... (sensors e actuators arrays rimangono uguali a prima) ...
-  const sensors = [{ id: 'greenhouse_temperature', label: 'Greenhouse Temp' }, { id: 'hydroponic_ph', label: 'Hydroponic pH' }, { id: 'mars/telemetry/airlock', label: 'Airlock (Stream)' }]; // accorciato qui per brevità, tieni il tuo array!
-  const actuators = [{ id: 'cooling_fan', label: 'Cooling Fan' }, { id: 'hall_ventilation', label: 'Hall Ventilation' }]; // tieni il tuo array completo!
+  const sensors = [
+    { id: 'greenhouse_temperature', label: 'Greenhouse Temp (REST)' },
+    { id: 'entrance_humidity', label: 'Entrance Humidity (REST)' },
+    { id: 'co2_hall', label: 'CO2 Hall (REST)' },
+    { id: 'hydroponic_ph', label: 'Hydroponic pH (REST)' },
+    { id: 'water_tank_level', label: 'Water Tank Level (REST)' },
+    { id: 'corridor_pressure', label: 'Corridor Pressure (REST)' },
+    { id: 'air_quality_pm25', label: 'Air Quality PM2.5 (REST)' },
+    { id: 'air_quality_voc', label: 'Air Quality VOC (REST)' },
+    { id: 'mars/telemetry/solar_array', label: 'Solar Array (Stream)' },
+    { id: 'mars/telemetry/radiation', label: 'Radiation (Stream)' },
+    { id: 'mars/telemetry/life_support', label: 'Life Support (Stream)' },
+    { id: 'mars/telemetry/thermal_loop', label: 'Thermal Loop (Stream)' },
+    { id: 'mars/telemetry/power_bus', label: 'Power Bus (Stream)' },
+    { id: 'mars/telemetry/power_consumption', label: 'Power Consump. (Stream)' },
+    { id: 'mars/telemetry/airlock', label: 'Airlock (Stream)' },
+  ];
+
+  const actuators = [
+    { id: 'cooling_fan', label: 'Cooling Fan' },
+    { id: 'entrance_humidifier', label: 'Entrance Humidifier' },
+    { id: 'hall_ventilation', label: 'Hall Ventilation' },
+    { id: 'habitat_heater', label: 'Habitat Heater' },
+  ];
   const operators = ['<', '<=', '=', '>', '>='];
 
   const getSensorLabel = (id) => sensors.find(s => s.id === id)?.label || id;
@@ -83,13 +105,13 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule }) => {
               <div className="bg-slate-800/50 p-6 rounded-2xl border border-white/5">
                 <span className="font-semibold text-xs tracking-widest uppercase mb-4 block text-slate-400">Condition</span>
                 <div className="grid grid-cols-12 gap-4">
-                  <select name="sensor" value={ruleForm.sensor} onChange={handleChange} className="col-span-6 p-3 rounded-lg border border-slate-700 bg-slate-900 text-slate-200 text-sm focus:border-cyan-500 outline-none">
+                  <select name="sensor" value={ruleForm.sensor} onChange={handleChange} className="col-span-6 p-3 rounded-lg border border-slate-700 bg-slate-900 text-cyan-300 text-sm focus:border-cyan-500 outline-none">
                     {sensors.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
                   </select>
                   <select name="operator" value={ruleForm.operator} onChange={handleChange} className="col-span-3 p-3 rounded-lg border border-slate-700 bg-slate-900 text-emerald-400 font-bold text-center focus:border-cyan-500 outline-none">
                     {operators.map(op => <option key={op} value={op}>{op}</option>)}
                   </select>
-                  <input type="number" name="value" value={ruleForm.value} onChange={handleChange} placeholder="Val" className="col-span-3 p-3 rounded-lg border border-slate-700 bg-slate-900 text-white font-mono focus:border-cyan-500 outline-none" required />
+                  <input type="number" name="value" value={ruleForm.value} onChange={handleChange} placeholder="Value" className="col-span-3 p-3 rounded-lg border border-slate-700 bg-slate-900 text-white font-mono focus:border-cyan-500 outline-none" required />
                 </div>
               </div>
 

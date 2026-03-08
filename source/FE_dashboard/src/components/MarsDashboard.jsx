@@ -102,7 +102,7 @@ const MarsDashboard = () => {
               
               {/* COLONNA 1: Odometro */}
               <div className="flex-1 flex flex-col items-center justify-start h-full">
-                <OdometerGauge value={sensorData.co2} min={500} max={2000} label="co2" needleColor="bg-rose-500" />
+                <OdometerGauge value={sensorData.co2} min={0} max={2000} label="co2" needleColor="bg-rose-500" />
               </div>
               
               {/* COLONNA 2: Grafico e Pressione */}
@@ -159,7 +159,7 @@ const MarsDashboard = () => {
                   <VerticalBarGauge value={sensorData.voltage} min={0} max={800} label="v" fillColor="from-slate-400 to-slate-200" tickCount={5} />
                   <VerticalBarGauge value={sensorData.ampere} min={0} max={400} label="a" fillColor="from-slate-400 to-slate-200" tickCount={5} />
                 </div>
-                <div className="flex gap-4 h-full border-l-2 border-slate-600 pl-4"> 
+                <div className="flex gap-4 h-full pl-4"> 
                   <VerticalBarGauge value={sensorData.production} min={0} max={300} label="pro" fillColor="from-emerald-400 to-green-400" tickCount={5} />
                   <VerticalBarGauge value={sensorData.consumption} min={0} max={300} label="cons" fillColor="from-rose-500 to-red-500" tickCount={5} />
                 </div>
@@ -190,21 +190,23 @@ const MarsDashboard = () => {
 
         {/* BOTTOM BAR */}
         <div className="flex justify-between items-center gap-4 h-16">
-          <div className="bg-slate-800 h-full rounded-2xl px-8 flex items-center justify-center border-2 border-slate-600 shadow-lg">
+          <div className="bg-slate-800 h-full rounded-2xl w-[30%] px-8 flex items-center justify-center border-2 border-slate-600 shadow-lg">
             <span className="text-white font-mono text-xl tracking-widest">H:1-2-1</span>
           </div>
 
-          <div className="bg-slate-800 h-full flex-grow rounded-2xl flex items-center justify-center border-2 border-slate-600 shadow-lg gap-4">
-            <span className="text-white font-black text-2xl tracking-[0.3em] uppercase">Operations</span>
+          <div className="bg-slate-800 h-full flex-grow rounded-2xl flex items-center justify-center border-2 border-slate-600 shadow-lg relative">
+            <span className="text-white font-black text-2xl tracking-[0.3em] uppercase">
+              Dashboard
+            </span>
             <button 
               onClick={() => setIsRuleManagerOpen(true)}
-              className="text-white bg-cyan-700 hover:bg-cyan-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow-md transition-colors"
+              className="absolute right-4 text-white bg-cyan-700 hover:bg-cyan-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow-md transition-colors"
             >
               ⚙️
             </button>
           </div>
 
-          <div className="bg-slate-800 h-full rounded-2xl px-6 flex items-center justify-center border-2 border-slate-600 shadow-lg gap-4">
+          <div className="bg-slate-800 h-full rounded-2xl w-[30%] px-6 flex items-center justify-center border-2 border-slate-600 shadow-lg gap-4">
             <span className={`font-bold text-xl ${!isAuto ? 'text-cyan-400' : 'text-slate-500'}`}>MANUAL</span>
             <div className="w-20 h-10 bg-slate-950 rounded-full p-1 cursor-pointer relative border-2 border-slate-600 shadow-inner" onClick={() => setIsAuto(!isAuto)}>
               <div className={`w-7 h-7 rounded-full shadow-md transition-transform duration-300 ease-in-out absolute top-1 ${isAuto ? 'translate-x-10 bg-emerald-500' : 'translate-x-0 bg-cyan-500'}`}></div>
