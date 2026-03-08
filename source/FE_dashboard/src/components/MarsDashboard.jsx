@@ -207,22 +207,34 @@ const MarsDashboard = () => {
           {/* 4. POWER */}
           <div className="bg-slate-800 rounded-[30px] border-2 border-red-500/50 p-4 flex flex-col shadow-lg relative">
             <div className="text-center text-red-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Power</div>
-            <div className="flex justify-between items-stretch flex-grow gap-6 h-full">
-              <div className="flex flex-col items-center justify-center">
-                <div className="scale-90"> 
-                  <OdometerGauge value={sensorData.tloop} min={10} max={55} label="tloop" needleColor="bg-red-500" />
-                </div>
+            
+            {/* Cambiato items-stretch in items-center per centrare verticalmente l'odometro rispetto alle barre */}
+            <div className="flex justify-between items-center flex-grow gap-2 h-full px-2">
+              
+              {/* Aggiunto flex-1 per dire "prenditi metà dello spazio disponibile" */}
+              <div className="flex flex-col items-center justify-center flex-1">
+                <OdometerGauge 
+                  value={sensorData.tloop} 
+                  min={10} 
+                  max={55} 
+                  label="tloop" 
+                  needleColor="bg-red-500" 
+                  scale={1.15} 
+                />
               </div>
-              <div className="flex gap-4 h-full"> 
-                <div className="flex gap-4 h-full">
+              
+              {/* Aggiunto flex-1 anche qui, così si bilanciano perfettamente con l'odometro */}
+              <div className="flex gap-3 h-full justify-end flex-1"> 
+                <div className="flex gap-3 h-full">
                   <VerticalBarGauge value={sensorData.voltage} min={0} max={800} label="v" fillColor="from-slate-400 to-slate-200" tickCount={5} />
                   <VerticalBarGauge value={sensorData.ampere} min={0} max={400} label="a" fillColor="from-slate-400 to-slate-200" tickCount={5} />
                 </div>
-                <div className="flex gap-4 h-full pl-4"> 
+                <div className="flex gap-3 h-full pl-3 border-l border-slate-700/50"> 
                   <VerticalBarGauge value={sensorData.production} min={0} max={300} label="pro" fillColor="from-emerald-400 to-green-400" tickCount={5} />
                   <VerticalBarGauge value={sensorData.consumption} min={0} max={300} label="cons" fillColor="from-rose-500 to-red-500" tickCount={5} />
                 </div>
               </div>
+              
             </div>
           </div>
 
