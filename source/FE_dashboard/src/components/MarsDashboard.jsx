@@ -75,7 +75,7 @@ const MarsDashboard = () => {
   const { sensorData, rules: backendRules, history, actuators, sendActuatorCommand } = useMarsData();
   const { rules: managedRules, handleSaveRule, handleDeleteRule, handleToggleRule } = useRules(backendRules);
 
-  const activeAlerts = managedRules
+  const activeAlerts = backendRules
     .filter((rule) => rule.action_type === 'UI_ALERT' && rule.is_active)
     .reduce((acc, rule) => {
       const observedValue = getRuleObservedValue(rule, sensorData);
@@ -265,9 +265,6 @@ const MarsDashboard = () => {
                 <div key={item.id} className="rounded-xl p-4 border border-slate-600 bg-slate-900/90">
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex flex-wrap items-center gap-2 min-w-0">
-                      <span className="text-[10px] font-black text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-2 py-1 rounded-full tracking-widest uppercase">
-                        {item.rule_id}
-                      </span>
                       <span className={`text-[10px] font-black px-2 py-1 rounded-full tracking-widest uppercase ${
                         item.action_type === 'UI_ALERT'
                           ? 'text-amber-300 bg-amber-500/10 border border-amber-500/30'
