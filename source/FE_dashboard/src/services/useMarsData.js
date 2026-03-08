@@ -193,7 +193,7 @@ export const useMarsData = () => {
     socketRef.current = ws;
     
     const initialLoadId = setTimeout(() => loadData(), 0);
-    const pollId = setInterval(() => loadData(), 5000);
+    const pollId = setInterval(() => loadData(), 500);
 
     ws.onopen = () => console.log('✅ Connesso a Marte con successo!');
 

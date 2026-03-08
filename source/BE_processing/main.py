@@ -127,6 +127,7 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
         if event_type == "RULE_UPDATED":
             print("[PROCESSOR] 🔄 Ricevuto RULE_UPDATED: Aggiorno la cache delle regole dal DB...")
             APP_STATE["cached_rules"] = fetch_rules()
+            rule_activation_state.clear()
             return
 
         source = event.get("source_name")
