@@ -124,7 +124,7 @@ const MarsDashboard = () => {
   };
 
   return (
-    <div className="h-screen w-full relative overflow-hidden bg-[#070b12] text-slate-100 font-sans">
+    <div className="h-screen overscroll-none w-full relative overflow-hidden bg-[#070b12] text-slate-100 font-sans">
       <style>{`
         .mars-scrollbar::-webkit-scrollbar {
           width: 6px;
