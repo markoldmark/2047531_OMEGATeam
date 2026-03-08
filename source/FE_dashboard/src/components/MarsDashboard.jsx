@@ -221,7 +221,7 @@ const MarsDashboard = () => {
                   onClick={() => toggleActuator(act)} 
                   disabled={isAuto}
                   className={`
-                    rounded-xl font-bold text-center text-xs tracking-wider h-full transition-all duration-150 outline-none
+                    rounded-xl font-bold text-center text-xs tracking-wider h-full whitespace-pre-line transition-all duration-150 outline-none
                     ${actuators[act] 
                       /* STATO ACCESO (ON) - Scende di 10px (per coprire l'ombra), si rimpicciolisce al 97% e perde l'ombra */
                       ? 'bg-red-500 text-black translate-y-[6px] scale-[0.90] shadow-none' 
@@ -231,7 +231,7 @@ const MarsDashboard = () => {
                     }
                   `} 
                 >
-                  {act.replace(/([A-Z])/g, ' $1').toUpperCase()}
+                  {act.replace(/([A-Z])/g, '\n$1').toUpperCase()}
                 </button>
               ))}
             </div>
