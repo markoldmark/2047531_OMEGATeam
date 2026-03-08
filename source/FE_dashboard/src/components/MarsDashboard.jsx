@@ -72,6 +72,8 @@ const MarsDashboard = () => {
   const [manualError, setManualError] = useState('');
   const [isRuleManagerOpen, setIsRuleManagerOpen] = useState(false);
 
+  const [pausedByManual, setPausedByManual] = useState([]);
+
   const { sensorData, rules: backendRules, history, actuators, sendActuatorCommand } = useMarsData();
   const { rules: managedRules, handleSaveRule, handleDeleteRule, handleToggleRule } = useRules(backendRules);
 
@@ -96,6 +98,28 @@ const MarsDashboard = () => {
       } catch (error) {
         setManualError('Manual override non riuscito');
       }
+    }
+  };
+
+  const handleModeToggle = () => {
+    const nextIsAuto = !isAuto;
+    setIsAuto(nextIsAuto);
+
+    if (!nextIsAuto) {
+      // 1. Stiamo passando a MANUAL. Trovo tutte le regole attive al momento.
+      const activeRuleIds = managedRules.filter(rule => rule.isActive).map(rule => rule.id);
+      
+      // 2. Mi salvo i loro ID per ricordarmeli.
+      setPausedByManual(activeRuleIds);
+      
+      // 3. Uso il tuo hook per mettere in pausa singolarmente ogni regola.
+      activeRuleIds.forEach(id => handleToggleRule(id, false));
+    } else {
+      // 1. Stiamo tornando ad AUTO. Riattivo SOLO le regole salvate in precedenza.
+      pausedByManual.forEach(id => handleToggleRule(id, true));
+      
+      // 2. Svuoto l'array perché non mi serve più.
+      setPausedByManual([]);
     }
   };
 
@@ -326,7 +350,7 @@ const MarsDashboard = () => {
 
             <div className="bg-slate-900/80 backdrop-blur-sm h-full rounded-2xl px-6 flex items-center justify-center border-2 border-slate-600/85 shadow-lg gap-4">
               <span className={`font-bold text-xl ${!isAuto ? 'text-cyan-400' : 'text-slate-500'}`}>MANUAL</span>
-              <div className="w-20 h-10 bg-slate-950 rounded-full p-1 cursor-pointer relative border-2 border-slate-600 shadow-inner" onClick={() => setIsAuto(!isAuto)}>
+              <div className="w-20 h-10 bg-slate-950 rounded-full p-1 cursor-pointer relative border-2 border-slate-600 shadow-inner" onClick={handleModeToggle}>
                 <div className={`w-7 h-7 rounded-full shadow-md transition-transform duration-300 ease-in-out absolute top-1 ${isAuto ? 'translate-x-10 bg-emerald-500' : 'translate-x-0 bg-cyan-500'}`}></div>
               </div>
               <span className={`font-bold text-xl ${isAuto ? 'text-emerald-400' : 'text-slate-500'}`}>AUTO</span>
