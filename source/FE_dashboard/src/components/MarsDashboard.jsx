@@ -101,6 +101,26 @@ const MarsDashboard = () => {
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden bg-[#070b12] text-slate-100 font-sans">
+      <style>{`
+        .mars-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .mars-scrollbar::-webkit-scrollbar-track {
+          background: rgba(15, 23, 42, 0.3); /* Sfondo traccia scuro */
+          border-radius: 8px;
+        }
+        .mars-scrollbar::-webkit-scrollbar-thumb {
+          background: #334155; /* Colore Slate-700 */
+          border-radius: 8px;
+        }
+        .mars-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #475569; /* Slate-600 al passaggio del mouse */
+        }
+        .mars-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #334155 transparent; /* Regola per Firefox */
+        }
+      `}</style>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(125,211,252,0.14),_transparent_28%),linear-gradient(180deg,_#08111b_0%,_#070b12_52%,_#160d0a_100%)]" aria-hidden="true" />
       <div className="absolute inset-x-0 top-0 h-[42vh] bg-[radial-gradient(circle_at_50%_0%,_rgba(255,255,255,0.08),_transparent_58%)]" aria-hidden="true" />
       <div className="absolute inset-x-0 bottom-[-8vh] h-[34vh] rounded-[100%] bg-[#6f2a16]/60 blur-3xl" aria-hidden="true" />
@@ -331,7 +351,7 @@ const MarsDashboard = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 overflow-y-auto pr-2 flex-1 min-h-0 overscroll-contain [contain:content]">
+          <div className="flex flex-col gap-2 overflow-y-auto pr-2 flex-1 min-h-0 overscroll-contain [contain:content] mars-scrollbar">
             {history.length === 0 && (
               <div className="text-sm text-slate-400 font-semibold italic">No trigger history yet</div>
             )}

@@ -61,7 +61,7 @@ const RuleManagement = ({ onClose, rules = [], onSaveRule, onDeleteRule, onToggl
         </div>
 
         {/* CONTENUTO */}
-        <div className="flex-grow overflow-y-auto pr-2 overscroll-contain [contain:content]">
+        <div className="flex-grow overflow-y-auto pr-2 overscroll-contain [contain:content] mars-scrollbar">
           
           {activeTab === 'list' && (
             <div className="flex flex-col gap-3 [contain:content]">
