@@ -12,7 +12,7 @@ The core of the system is a Rule Engine that evaluates incoming normalized event
 ### Botanist
 * **US1:** As a Botanist, if the `greenhouse_temperature` rises above 32 degrees, activate the `cooling_fan`.
 * **US2:** As a Botanist, if the `greenhouse_temperature` falls below 25 degrees, activate the `habitat_heater`.
-* **US3:** As a Botanist, if the `water_tank_level` falls below 60%., deactivate the `entrance_humidifier`.
+* **US3:** As a Botanist, if the `water_tank_level` falls below 60%, deactivate the `entrance_humidifier`.
 * **US4:** As a Botanist, if the `hydroponic_ph` rises above 9, a warning UI light is turned on to block nutrients.
 
 ### Safety Manager
@@ -30,7 +30,7 @@ The core of the system is a Rule Engine that evaluates incoming normalized event
 * **US14:** As an Energy Engineer, if the voltage of the `power_bus` exceeds 250V, activate `cooling_fan`.
 
 ### Administrator
-* **US15:** As an Administrator, I want to graphically view the habitat temperature to keep track of the trends.
+* **US15:** As an Administrator, I want to graphically view the habitat oxygen to keep track of the trends.
 * **US16:** As an Administrator, I want to view the history of the warning lights that were on during the session to reconstruct any emergency sequences.
 * **US17:** As an Administrator, I want to monitor the `corridor_pressure` to possibly provide emergency suits.
 * **US18:** As an Administrator, I want to view the status of the `airlock` to coordinate activities safely.

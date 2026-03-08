@@ -5,36 +5,28 @@ const OdometerGauge = ({
   min = 0, 
   max = 100, 
   label = "", 
-  needleColor = "bg-red-600" 
+  needleColor = "bg-rose-500" 
 }) => {
-  // Evitiamo che la lancetta "esca" dal tachimetro se i dati sballano
   const clampValue = Math.min(Math.max(value, min), max);
-  
-  // Calcolo la percentuale (da 0 a 1)
   const percentage = (clampValue - min) / (max - min);
-  
-  // Mappo la percentuale da 0 a 1 in un angolo da -90 a 90 gradi
   const rotation = (percentage * 180) - 90;
 
   return (
     <div className="flex flex-col items-center">
-      {label && <div className="text-xs font-bold text-gray-700 mb-2 uppercase">{label}</div>}
+      {label && <div className="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-widest">{label}</div>}
       
-      {/* Semicerchio del tachimetro */}
-      <div className="w-24 h-12 bg-gray-300 rounded-t-full relative overflow-hidden border-4 border-b-0 border-gray-600 shadow-inner">
+      <div className="w-24 h-12 bg-slate-800/80 rounded-t-full relative overflow-hidden border border-b-0 border-white/10 shadow-[inset_0_4px_10px_rgba(0,0,0,0.5)] backdrop-blur-sm">
         
-        {/* Lancetta */}
+        {/* Lancetta Neon */}
         <div 
-          className={`absolute bottom-0 left-1/2 w-1 h-10 ${needleColor} origin-bottom transition-transform duration-500 ease-out`}
+          className={`absolute bottom-0 left-1/2 w-1 h-10 ${needleColor} origin-bottom transition-transform duration-700 ease-out shadow-[0_0_8px_currentColor]`}
           style={{ transform: `translateX(-50%) rotate(${rotation}deg)` }}
         ></div>
         
-        {/* Perno centrale */}
-        <div className="absolute bottom-0 left-1/2 w-3 h-3 bg-gray-800 rounded-full transform -translate-x-1/2 translate-y-1/2"></div>
+        <div className="absolute bottom-0 left-1/2 w-4 h-4 bg-slate-900 border border-slate-600 rounded-full transform -translate-x-1/2 translate-y-1/2 z-10"></div>
       </div>
       
-      {/* Valore numerico testuale */}
-      <div className="mt-2 text-sm font-bold text-gray-800 bg-gray-300 px-2 rounded border border-gray-400">
+      <div className="mt-3 text-xs font-bold text-cyan-50 bg-slate-900/80 px-3 py-1 rounded-md border border-white/10 shadow-[0_0_10px_rgba(0,0,0,0.3)] tracking-wider">
         {clampValue.toFixed(1)}
       </div>
     </div>

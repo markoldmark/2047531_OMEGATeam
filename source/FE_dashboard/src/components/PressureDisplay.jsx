@@ -3,20 +3,19 @@ import React from 'react';
 const PressureDisplay = ({ value = 0, label = "press" }) => {
   return (
     <div className="flex flex-col items-center">
-      {/* Contenitore principale (Lo "schermetto") */}
-      <div className="w-36 h-24 bg-[#e5e7eb] rounded-[25px] border-[3px] border-gray-500 shadow-inner flex items-center justify-center relative overflow-hidden">
+      <div className="w-36 h-24 bg-slate-900/80 rounded-2xl border border-white/10 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] flex items-center justify-center relative overflow-hidden backdrop-blur-md">
         
-        {/* Riflesso opzionale per dare l'effetto "vetro" dello schermo */}
-        <div className="absolute top-0 left-0 w-full h-1/2 bg-white/20 -skew-y-12 transform -translate-y-4"></div>
+        {/* Effetto scanline/vetro scuro */}
+        <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-full h-1/2 bg-white/5 -skew-y-12 transform -translate-y-4"></div>
 
-        {/* Valore numerico */}
-        <span className="text-4xl font-black text-[#4b5563] tracking-tighter z-10">
+        {/* Testo Neon */}
+        <span className="text-4xl font-black text-cyan-400 tracking-widest z-10 drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]">
           {Math.round(value)}
         </span>
       </div>
 
-      {/* Etichetta sotto lo schermo */}
-      <div className="mt-1 text-sm font-bold text-black uppercase tracking-widest opacity-80">
+      <div className="mt-2 text-xs font-semibold text-slate-400 uppercase tracking-widest">
         {label}
       </div>
     </div>

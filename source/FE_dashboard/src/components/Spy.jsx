@@ -1,20 +1,16 @@
+// Spy.jsx
 import React from 'react';
 
 const Spy = ({ label, isOn = false }) => {
   return (
     <div className="flex items-center gap-3">
-      {/* Label (D, P, I) */}
-      <span className="text-gray-800 font-black text-sm w-3 text-right">{label}</span>
-      
-      {/* Cerchio della spia */}
-      <div className={`w-6 h-6 rounded-full border-2 border-black shadow-md transition-all duration-300
+      <span className="text-slate-400 font-bold text-xs w-3 text-right tracking-widest">{label}</span>
+      <div className={`w-5 h-5 rounded-full border transition-all duration-300
         ${isOn 
-          ? 'bg-[#7c3aed] shadow-[0_0_12px_rgba(124,58,237,0.8)] border-purple-400' 
-          : 'bg-[#4c1d95] opacity-40 border-black'}`}>
+          ? 'bg-violet-500 border-violet-300 shadow-[0_0_15px_rgba(139,92,246,0.8)]' 
+          : 'bg-slate-800 opacity-50 border-white/10'}`}>
       </div>
     </div>
   );
 };
-
-// QUESTA RIGA È FONDAMENTALE:
 export default Spy;
