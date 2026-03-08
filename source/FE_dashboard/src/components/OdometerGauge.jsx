@@ -53,7 +53,7 @@ const OdometerGauge = ({
         </div>
         
         {/* Valore numerico */}
-        <div className="mt-3 text-xs font-bold text-cyan-50 bg-slate-900/80 px-3 py-1 rounded-md border border-white/10 shadow-[0_0_10px_rgba(0,0,0,0.3)] tracking-wider">
+        <div className="mt-1 text-xs font-bold text-cyan-50 bg-slate-900/80 px-3 py-1 rounded-md border border-white/10 shadow-[0_0_10px_rgba(0,0,0,0.3)] tracking-wider">
           {clampValue.toFixed(max <= 1 ? 2 : 1)}
         </div>
       </div>

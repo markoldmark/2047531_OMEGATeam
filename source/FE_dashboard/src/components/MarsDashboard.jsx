@@ -138,7 +138,7 @@ const MarsDashboard = () => {
             <div className="text-center text-amber-400 font-bold text-lg tracking-[0.2em] uppercase mb-4">Habitat</div>
             
             {/* Layout a 3 Colonne Equilibrate */}
-            <div className="flex justify-between items-center flex-grow h-full gap-2">
+            <div className="flex justify-between items-center flex-grow h-full gap-4">
               
               {/* COLONNA 1: Odometro */}
               <div className="flex-1 flex flex-col items-center justify-start h-full">
@@ -171,7 +171,7 @@ const MarsDashboard = () => {
             
             <div className="text-center text-cyan-400 font-bold text-lg tracking-[0.2em] uppercase mb-2">Airlock</div>
             
-            <div className="grid grid-cols-2 gap-4 flex-grow items-start pt-2">
+            <div className="grid grid-cols-2 gap-6 flex-grow items-start pt-2">
               
               <div className="flex flex-col items-center justify-start">
                 <OdometerGauge 
@@ -185,7 +185,7 @@ const MarsDashboard = () => {
                 />
               </div>
               
-              <div className="flex flex-col gap-3 items-start pl-6 justify-start mt-4">
+              <div className="flex flex-row gap-3 items-center justify-center mt-16">
                 <Spy label="D" isOn={sensorData.statusD} />
                 <Spy label="P" isOn={sensorData.statusP} />
                 <Spy label="I" isOn={sensorData.statusI} />
