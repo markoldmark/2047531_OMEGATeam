@@ -6,8 +6,10 @@ import WarningLight from './WarningLight';
 import PressureDisplay from './PressureDisplay';
 import O2Graph from './O2Graph';
 import Spy from './Spy';
+import RuleManagement from './RuleManagement';
 
 import { useMarsData } from '../services/useMarsData';
+import { useRules } from '../services/handleRules';
 
 const ALERT_TARGETS = {
   greenhousePh: 'greenhouse_ph_warning',
@@ -48,10 +50,12 @@ const evaluateRule = (value, operator, threshold) => {
 const MarsDashboard = () => {
   const [isAuto, setIsAuto] = useState(true);
   const [manualError, setManualError] = useState('');
+  const [isRuleManagerOpen, setIsRuleManagerOpen] = useState(false);
 
-  const { sensorData, rules, history, actuators, sendActuatorCommand } = useMarsData();
+  const { sensorData, rules:backendRules, history, actuators, sendActuatorCommand } = useMarsData();
+  const { rules: managedRules, handleSaveRule, handleDeleteRule } = useRules(backendRules);
 
-  const activeAlerts = rules
+  const activeAlerts = managedRules
     .filter((rule) => rule.action_type === 'UI_ALERT' && rule.is_active)
     .reduce((acc, rule) => {
       const observedValue = getRuleObservedValue(rule, sensorData);
@@ -217,9 +221,17 @@ const MarsDashboard = () => {
           <div className="bg-[#4b5563] h-full rounded-2xl px-8 flex items-center justify-center shadow-inner">
             <span className="text-white font-bold text-2xl tracking-widest">H: 1-2-1</span>
           </div>
-          
-          <div className="bg-[#4b5563] h-full flex-grow rounded-2xl flex items-center justify-center shadow-inner">
+
+          {/* 3. Aggiunto il pulsante e un gap al container della Dashboard */}
+          <div className="bg-[#4b5563] h-full flex-grow rounded-2xl flex items-center justify-center shadow-inner gap-4">
             <span className="text-white font-black text-3xl tracking-widest uppercase">Dashboard</span>
+            <button 
+              onClick={() => setIsRuleManagerOpen(true)}
+              className="text-white bg-gray-500 hover:bg-gray-400 rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl shadow-md transition-colors"
+              title="Open Rule Management"
+            >
+              ^
+            </button>
           </div>
 
           <div className="bg-[#4b5563] h-full rounded-2xl px-6 flex items-center justify-center shadow-inner gap-4">
@@ -241,29 +253,6 @@ const MarsDashboard = () => {
 
         {/* RULES & HISTORY (Puliti dai riferimenti UI_ALERT) */}
         <div className="grid grid-cols-2 gap-6">
-          <div className="bg-white rounded-[30px] p-5 border-4 border-gray-400 shadow-inner min-h-[220px]">
-            <div className="text-black font-bold text-xl tracking-widest uppercase mb-4">rules</div>
-            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto">
-              {rules.length === 0 && (
-                <div className="text-sm text-gray-500">No rules available</div>
-              )}
-              {rules.map((rule) => (
-                <div key={rule.rule_id} className="rounded-2xl p-3 border bg-gray-100 border-gray-300">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-sm font-bold text-gray-800">{rule.rule_id}</div>
-                  </div>
-                  <div className="text-sm text-gray-700">{rule.description}</div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    IF {rule.source_name} {rule.operator} {rule.threshold} {"->"} SET {rule.actuator_name} to {rule.actuator_state}
-                  </div>
-                  <div className="text-xs mt-2 font-semibold">
-                    {rule.is_active ? 'ACTIVE' : 'INACTIVE'}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           <div className="bg-white rounded-[30px] p-5 border-4 border-gray-400 shadow-inner min-h-[220px]">
             <div className="text-black font-bold text-xl tracking-widest uppercase mb-4">history</div>
             <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto">
@@ -289,6 +278,15 @@ const MarsDashboard = () => {
         </div>
 
       </div>
+      {/* 5. Rendering condizionale della modale Rule Management */}
+      {isRuleManagerOpen && (
+        <RuleManagement 
+          rules={managedRules} 
+          onClose={() => setIsRuleManagerOpen(false)}
+          onSaveRule={handleSaveRule}
+          onDeleteRule={handleDeleteRule}
+        />
+      )}
     </div>
   );
 };

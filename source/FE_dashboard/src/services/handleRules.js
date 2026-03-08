@@ -1,42 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export const useRules = () => {
-  // STATO PER LE REGOLE (Inizializzato con una regola di esempio)
-  const [rules, setRules] = useState([
-    {
-      id: 1,
-      sensor: 'greenhouse_temperature',
-      operator: '>',
-      value: '28',
-      actuator: 'cooling_fan',
-      action: 'ON'
-    }
-  ]);
+export const useRules = (backendRules = []) => {
+  const [rules, setRules] = useState([]);
 
-  // Funzione per salvare (creare o aggiornare) una regola
+  // Quando arrivano o cambiano le regole dal DB, le mappiamo per la UI
+  useEffect(() => {
+    const mappedRules = backendRules
+      // Opzionale: filtra gli alert di sistema se non vuoi che appaiano tra le regole degli attuatori
+      .filter(r => r.action_type !== 'UI_ALERT') 
+      .map(r => ({
+        id: r.rule_id,               // Il DB usa rule_id come identificativo testuale
+        sensor: r.source_name,       // Il sensore sorgente
+        operator: r.operator,        // L'operatore (<, >, =)
+        value: r.threshold,          // Il valore soglia
+        actuator: r.target,          // main.py chiama l'attuatore "target"
+        action: r.payload            // main.py chiama lo stato dell'attuatore "payload"
+      }));
+
+    setRules(mappedRules);
+  }, [backendRules]);
+
+  // Funzione per salvare (creare o aggiornare)
   const handleSaveRule = (newRule) => {
+    // Aggiornamento ottimistico dell'UI
     setRules(prevRules => {
-      // Se la regola esiste già (stesso id), aggiornala
       const exists = prevRules.find(r => r.id === newRule.id);
       if (exists) {
         return prevRules.map(r => r.id === newRule.id ? newRule : r);
       }
-      // Altrimenti aggiungila alla lista
       return [...prevRules, newRule];
     });
     
-    // TODO: In futuro qui farai la chiamata API (es. fetch) per salvare nel DB
-    console.log("Regola salvata nel DB fittizio:", newRule);
+    // TODO: Qui farai fetch('/api/rules', { method: 'POST', body: JSON.stringify({...}) })
+    console.log("Regola pronta per il backend:", newRule);
   };
 
-  // Funzione per eliminare una regola
+  // Funzione per eliminare
   const handleDeleteRule = (idToDelete) => {
+    // Aggiornamento ottimistico dell'UI
     setRules(prevRules => prevRules.filter(r => r.id !== idToDelete));
     
-    // TODO: In futuro qui farai la chiamata API DELETE verso il backend
-    console.log("Regola eliminata dal DB fittizio, ID:", idToDelete);
+    // TODO: Qui farai fetch(`/api/rules/${idToDelete}`, { method: 'DELETE' })
+    console.log("Regola eliminata lato UI, ID:", idToDelete);
   };
 
-  // Restituiamo lo stato e le funzioni per poterle usare nel componente
   return { rules, handleSaveRule, handleDeleteRule };
 };
