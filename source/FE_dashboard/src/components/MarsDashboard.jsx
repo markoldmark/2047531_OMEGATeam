@@ -168,17 +168,30 @@ const MarsDashboard = () => {
                 <WarningLight isOn={Boolean(activeAlerts[ALERT_TARGETS.airlockCycles])} isBlinking={true} text="!" activeColor="bg-amber-400" inactiveColor="bg-slate-700" />
               </div>
             </div>
-            <div className="text-center text-cyan-400 font-bold text-lg tracking-[0.2em] uppercase mb-6">Airlock</div>
-            <div className="grid grid-cols-2 gap-4 flex-grow items-center">
-              <div className="flex flex-col items-center justify-center">
-                <OdometerGauge value={sensorData.radiation} min={0} max={10} label="radiation" needleColor="bg-cyan-400" />
+            
+            <div className="text-center text-cyan-400 font-bold text-lg tracking-[0.2em] uppercase mb-2">Airlock</div>
+            
+            <div className="grid grid-cols-2 gap-4 flex-grow items-start pt-2">
+              
+              <div className="flex flex-col items-center justify-start">
+                <OdometerGauge 
+                  value={sensorData.radiation} 
+                  min={0} 
+                  max={1} 
+                  label="radiation" 
+                  needleColor="bg-cyan-400" 
+                  ticks={[0.25, 0.5, 0.75]} 
+                  scale={1.35} 
+                />
               </div>
-              <div className="flex flex-col gap-3 items-start pl-6 justify-center border-l-2 border-slate-600">
+              
+              <div className="flex flex-col gap-3 items-start pl-6 justify-start mt-4">
                 <Spy label="D" isOn={sensorData.statusD} />
                 <Spy label="P" isOn={sensorData.statusP} />
                 <Spy label="I" isOn={sensorData.statusI} />
               </div>
-              <div className="col-span-2 mt-2 pt-4 border-t-2 border-slate-600">
+              
+              <div className="col-span-2 mt-auto pb-2">
                 <div className="flex flex-col items-center gap-2 w-full">
                   <div className="flex items-center gap-4 w-full justify-center">
                     <div className="flex-grow max-w-[88%]">
@@ -187,6 +200,7 @@ const MarsDashboard = () => {
                   </div>
                 </div>
               </div>
+              
             </div>
           </div>
 
