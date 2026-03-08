@@ -74,7 +74,7 @@ const O2Graph = ({ data = [], label = "o2 %", maxPoints = 100 }) => {
         </div>
       </div>
 
-      <div className="text-slate-400 font-semibold text-xs mt-1 uppercase tracking-[0.2em] -mt-6 ml-6 scale-75">
+      <div className="text-slate-400 font-semibold text-xs uppercase tracking-[0.2em] -mt-5 ml-6 scale-75">
         {label}
       </div>
     </div>
