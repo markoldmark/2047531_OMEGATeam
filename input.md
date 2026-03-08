@@ -10,14 +10,14 @@ The core of the system is a Rule Engine that evaluates incoming normalized event
 ## 2. User Stories
 
 ### Botanist
-* **US1:** As a Botanist, if the `greenhouse_temperature` rises above 32 degrees, it automatically activate the `cooling_fan`.
-* **US2:** As a Botanist, if the `greenhouse_temperature` falls below 25 degrees, it automatically activate the `habitat_heater`.
-* **US3:** As a Botanist, if the `water_tank_level` falls below 60%, deactivate the `entrance_humidifier`.
+* **US1:** As a Botanist, if the `greenhouse_temperature` rises above 32 degrees, it automatically activates the `cooling_fan`.
+* **US2:** As a Botanist, if the `greenhouse_temperature` falls below 25 degrees, it automatically activates the `habitat_heater`.
+* **US3:** As a Botanist, if the `water_tank_level` falls below 60%, it automatically deactivates the `entrance_humidifier`.
 * **US4:** As a Botanist, if the `hydroponic_ph` rises above 9, a warning UI light is turned on to block nutrients.
 
 ### Safety Manager
-* **US5:** As a Safety Manager, if the `entrance_humidity` drops below 40%, it automatically activate the `entrance_humidifier`.
-* **US6:** As a Safety Manager, if the `thermal_loop` exceeds 55 degrees, activate the `cooling_fan`.
+* **US5:** As a Safety Manager, if the `entrance_humidity` drops below 40%, it automatically activates the `entrance_humidifier`.
+* **US6:** As a Safety Manager, if the `thermal_loop` exceeds 55 degrees, it automatically activates the `cooling_fan`.
 * **US7:** As a Safety Manager, if the `co2_hall` exceeds 950ppm, it automatically activates `hall_ventilation`.
 * **US8:** As a Safety Manager, if the `air_quality_pm25` exceeds 35, it automatically activates `hall_ventilation`.
 * **US9:** As a Safety Manager, if the `airlock` cycles exceed 10 in the same hour, a warning UI light is turned on.
@@ -25,9 +25,9 @@ The core of the system is a Rule Engine that evaluates incoming normalized event
 
 ### Energy Engineer
 * **US11:** As an Energy Engineer, I want to compare the power produced by the `solar_array` panels with the power consumed `power_consumption` to check that the one produced is never lower.
-* **US12:** As an Energy Engineer, if the `power_consumption` exceeds 50 KW, deactivate `habitat_heater`.
-* **US13:** As an Energy Engineer, if the current of the `power_bus` exceeds 220A, activate `cooling_fan`.
-* **US14:** As an Energy Engineer, if the voltage of the `power_bus` exceeds 250V, activate `cooling_fan`.
+* **US12:** As an Energy Engineer, if the `power_consumption` exceeds 50 KW, it automatically deactivates `habitat_heater`.
+* **US13:** As an Energy Engineer, if the current of the `power_bus` exceeds 220A, it automatically activates `cooling_fan`.
+* **US14:** As an Energy Engineer, if the voltage of the `power_bus` exceeds 250V, it automatically activates `cooling_fan`.
 
 ### Administrator
 * **US15:** As an Administrator, I want to graphically view the habitat oxygen to keep track of the trends.
