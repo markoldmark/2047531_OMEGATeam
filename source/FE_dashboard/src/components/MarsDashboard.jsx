@@ -236,7 +236,7 @@ const MarsDashboard = () => {
                 />
               </div>
               
-              <div className="flex flex-row gap-3 items-center justify-center mt-16">
+              <div className="flex flex-row gap-3 items-center justify-center mr-6 mt-16">
                 <Spy label="D" isOn={sensorData.statusD} />
                 <Spy label="P" isOn={sensorData.statusP} />
                 <Spy label="I" isOn={sensorData.statusI} />
