@@ -404,6 +404,8 @@ async def update_rule(rule_id: str, update: RuleStatusUpdate):
     if not updated_rule:
         raise HTTPException(status_code=404, detail="Rule not found")
 
+    await notify_rule_change()
+
     return updated_rule
 
 @app.delete("/api/rules/{rule_id}")
