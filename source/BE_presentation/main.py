@@ -504,6 +504,7 @@ async def set_system_mode(payload: SystemMode):
         for r in alert_rules_cache:
             if r["rule_id"] in active_alert_rules:
                 r["is_active"] = False
+                # Qui lo mettevi già a False, che è corretto per l'alert cache!
                 alert_rule_activation_state[r["rule_id"]] = False
                 
         # 3. Salva gli ID di chi abbiamo appena spento
@@ -527,6 +528,12 @@ async def set_system_mode(payload: SystemMode):
             for r in alert_rules_cache:
                 if r["rule_id"] in paused_by_manual:
                     r["is_active"] = True
+            
+            # ---> MODIFICA CHIAVE QUI <---
+            # Resettiamo lo stato interno di attivazione di TUTTE le regole (sia DB che Alert)
+            # così che la funzione `should_emit_alert` le veda come "mai attivate"
+            for rule_id in paused_by_manual:
+                alert_rule_activation_state[rule_id] = False
                     
             paused_by_manual.clear()
             await notify_rule_change()
