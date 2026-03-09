@@ -116,7 +116,6 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
             return
         
         if event_type == "RULE_UPDATED":
-            print("[PROCESSOR] 🔄 Ricevuto RULE_UPDATED: Aggiorno la cache delle regole dal DB...")
             APP_STATE["cached_rules"] = fetch_rules()
             rule_activation_state.clear()
             return
@@ -132,12 +131,10 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
                     condition_met = evaluate_condition(current_value, rule['operator'], rule['threshold'])
                     if should_emit_trigger(rule['rule_id'], condition_met):
                         
-                        # Triggera l'attuatore SOLO se l'azione lo richiede
                         if rule['action_type'] == 'ACTUATOR_COMMAND':
                             await trigger_actuator(rule['target'], rule['payload'])
                             print(f"[RULE TRIGGERED] {rule['rule_id']}: {rule['target']} -> {rule['payload']}")
-                        
-                        # Pubblica SEMPRE la history (sia per attuatori che per gli alert UI)
+
                         await publish_rule_history(exchange, rule, current_value)
 
 async def main():
