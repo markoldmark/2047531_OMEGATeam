@@ -25,11 +25,10 @@ SIMULATOR_URL = os.getenv("SIMULATOR_URL", "http://simulator:8080")
 rule_activation_state = {}
 
 def get_db_connection():
-    """Crea una connessione al database delle regole."""
     return psycopg2.connect(**DB_CONFIG)
 
 def fetch_rules():
-    """Recupera solo le regole attive per attuatori dal DB in ordine stabile."""
+    """Recupera TUTTE le regole attive dal DB (attuatori + alert)."""
     try:
         conn = get_db_connection()
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -37,7 +36,7 @@ def fetch_rules():
                 """
                 SELECT *
                 FROM automation_rules
-                WHERE is_active = TRUE AND action_type = 'ACTUATOR_COMMAND'
+                WHERE is_active = TRUE
                 ORDER BY created_at ASC, id ASC;
                 """
             )
@@ -49,7 +48,6 @@ def fetch_rules():
         if 'conn' in locals(): conn.close()
 
 async def publish_rule_history(exchange, rule, observed_value):
-    """Pubblica sul broker un evento di trigger per la history volatile."""
     payload = {
         "event_type": "RULE_TRIGGER",
         "id": str(uuid.uuid4()),
@@ -68,7 +66,6 @@ async def publish_rule_history(exchange, rule, observed_value):
     )
 
 async def trigger_actuator(actuator, state):
-    """Invia comando REST al simulatore per aggiornare un attuatore."""
     url = f"{SIMULATOR_URL}/api/actuators/{actuator}"
     async with httpx.AsyncClient() as client:
         try:
@@ -78,7 +75,6 @@ async def trigger_actuator(actuator, state):
             print(f"[ACTION] Errore trigger: {e}")
 
 def evaluate_condition(value, operator, threshold):
-    """Valuta la condizione di una regola su valori numerici o testuali."""
     try:
         val = float(value)
         thr = float(threshold)
@@ -94,7 +90,6 @@ def evaluate_condition(value, operator, threshold):
     return False
 
 def extract_metric_value(measurements, metric_key):
-    """Estrae dinamicamente il valore della metrica dal payload normalizzato."""
     if metric_key in measurements:
         return measurements.get(metric_key)
 
@@ -107,16 +102,12 @@ def extract_metric_value(measurements, metric_key):
 
     return None
 
-
 def should_emit_trigger(rule_id, condition_met):
-    """Emette un trigger solo sul fronte di attivazione della regola."""
     was_active = rule_activation_state.get(rule_id, False)
     rule_activation_state[rule_id] = condition_met
     return condition_met and not was_active
 
-
 async def process_message(message: aio_pika.IncomingMessage, exchange):
-    """Processa un evento dal broker e valuta le regole compatibili."""
     async with message.process():
         event = json.loads(message.body.decode())
         event_type = event.get("event_type")
@@ -140,8 +131,13 @@ async def process_message(message: aio_pika.IncomingMessage, exchange):
                 if current_value is not None:
                     condition_met = evaluate_condition(current_value, rule['operator'], rule['threshold'])
                     if should_emit_trigger(rule['rule_id'], condition_met):
-                        await trigger_actuator(rule['target'], rule['payload'])
-                        print(f"[RULE TRIGGERED] {rule['rule_id']}: {rule['target']} -> {rule['payload']}")
+                        
+                        # Triggera l'attuatore SOLO se l'azione lo richiede
+                        if rule['action_type'] == 'ACTUATOR_COMMAND':
+                            await trigger_actuator(rule['target'], rule['payload'])
+                            print(f"[RULE TRIGGERED] {rule['rule_id']}: {rule['target']} -> {rule['payload']}")
+                        
+                        # Pubblica SEMPRE la history (sia per attuatori che per gli alert UI)
                         await publish_rule_history(exchange, rule, current_value)
 
 async def main():

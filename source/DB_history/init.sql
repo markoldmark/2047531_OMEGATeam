@@ -11,7 +11,7 @@ CREATE TABLE automation_rules (
     operator VARCHAR(2) NOT NULL CHECK (operator IN ('>', '<', '=', '==', '>=', '<=')),
     threshold VARCHAR(50) NOT NULL,
 
-    action_type VARCHAR(20) NOT NULL CHECK (action_type = 'ACTUATOR_COMMAND'),
+    action_type VARCHAR(20) NOT NULL CHECK (action_type IN ('ACTUATOR_COMMAND', 'UI_ALERT')),
     target VARCHAR(100) NOT NULL,
     payload VARCHAR(100) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -50,3 +50,9 @@ VALUES ('rule_010', 'US13 - Raffredda oltre 220A sul power bus', 'mars/telemetry
 
 INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
 VALUES ('rule_011', 'US14 - Raffredda oltre 250V sul power bus', 'mars/telemetry/power_bus', 'voltage_v', '>', '250', 'ACTUATOR_COMMAND', 'cooling_fan', 'ON');
+
+INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
+VALUES ('alert_001', 'ALLARME PH SERRA', 'hydroponic_ph', 'ph', '>', '9', 'UI_ALERT', 'greenhouse_ph_warning', 'ON');
+
+INSERT INTO automation_rules (rule_id, description, source_name, metric_key, operator, threshold, action_type, target, payload)
+VALUES ('alert_002', 'ALLARME CICLI AIRLOCK', 'mars/telemetry/airlock', 'cycles_per_hour', '>', '10', 'UI_ALERT', 'airlock_cycles_warning', 'ON');

@@ -201,7 +201,6 @@ export const useMarsData = () => {
       const message = JSON.parse(event.data);
 
       if (message.event_type === 'RULE_UPDATED') {
-        console.log("⚡ Ricevuto RULE_UPDATED dal broker! Ricarico le regole...");
         loadData(); 
         return;
       }
