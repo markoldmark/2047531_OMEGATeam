@@ -17,6 +17,12 @@ services:
       - "5432:5432"
     volumes:
       - ./DB_history/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mars_user -d mars_iot_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   rabbitmq:
@@ -39,13 +45,13 @@ services:
     container_name: BE_data-ingestion
     environment:
       - RABBITMQ_HOST=rabbitmq
-      - SIMULATOR_URL=http://simulator:8080                 
+      - SIMULATOR_URL=http://simulator:8080                
       - SIMULATOR_WS_URL=ws://simulator:8080/api/telemetry/ws
     depends_on:
-          rabbitmq:
-            condition: service_healthy
-          db:
-            condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy 
     restart: unless-stopped
 
   be_processing:
@@ -57,12 +63,11 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - SIMULATOR_URL=http://simulator:8080
       - PYTHONUNBUFFERED=1
-      - RABBITMQ_HOST=rabbitmq
     depends_on:
       rabbitmq:
         condition: service_healthy
       db:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
 
   be_presentation:
@@ -77,10 +82,10 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-          rabbitmq:
-            condition: service_healthy
-          db:
-            condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   frontend:
@@ -99,3 +104,6 @@ services:
       - simulator
       - be_presentation
     restart: unless-stopped
+
+volumes:
+  pg_data:
