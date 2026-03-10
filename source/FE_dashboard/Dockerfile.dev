@@ -1,21 +1,13 @@
-# Usa un'immagine Node leggera
 FROM node:20-alpine
 
-# Imposta la cartella di lavoro nel container
 WORKDIR /app
 
-# Copia solo i file delle dipendenze per sfruttare la cache di Docker
 COPY package*.json ./
 
-# Installa le dipendenze
 RUN npm install
 
-# Copia il resto del codice
 COPY . .
 
-# Esponi la porta (5173 per Vite, 3000 per Create React App)
 EXPOSE 5173 
 
-# Avvia il server di sviluppo (modifica se usi CRA in "npm start")
-# Il flag --host è fondamentale per Vite dentro Docker!
 CMD ["npm", "run", "dev", "--", "--host"]
