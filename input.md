@@ -75,7 +75,7 @@ To process heterogeneous data (REST arrays, scalar objects, Telemetry streams) u
     },
     "status": {
       "type": "string",
-      "enum": ["ok", "warning", "critical", "very critical"]
+      "enum": ["ok", "warning"]
     }
   }
 }

@@ -1,15 +1,3 @@
-  # frontend:
-  #   build: 
-  #     context: ./FE_dashboard
-  #     dockerfile: Dockerfile
-  #   container_name: FE_dashboard
-  #   ports:
-  #     - "3000:80"
-  #   depends_on:
-  #     - db
-  #     - simulator
-  #   restart: unless-stopped
-
 services:
   simulator:
     image: mars-iot-simulator:multiarch_v1
@@ -98,7 +86,7 @@ services:
   frontend:
     build: 
       context: ./FE_dashboard
-      dockerfile: Dockerfile.dev 
+      dockerfile: Dockerfile
     container_name: FE_dashboard
     ports:
       - "5173:5173" 
