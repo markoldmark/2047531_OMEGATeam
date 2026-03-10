@@ -44,7 +44,8 @@ To process heterogeneous data (REST arrays, scalar objects, Telemetry streams) u
 ```json
 {
   "type": "object",
-  "required": ["event_id", "timestamp", "source_type", "source_name", "measurements"],
+  "required": ["event_id", "timestamp", "source_type",
+                 "source_name", "measurements"],
   "properties": {
     "event_id": { 
       "type": "string", 
@@ -62,7 +63,8 @@ To process heterogeneous data (REST arrays, scalar objects, Telemetry streams) u
     },
     "source_name": { 
       "type": "string",
-      "description": "Sensor ID (e.g., 'greenhouse_temperature') or Topic Name (e.g., 'mars/telemetry/airlock')"
+      "description": "Sensor ID (e.g., 'greenhouse_temperature') 
+                    or Topic Name (e.g., 'mars/telemetry/airlock')"
     },
     "measurements": {
       "type": "object",
@@ -73,7 +75,7 @@ To process heterogeneous data (REST arrays, scalar objects, Telemetry streams) u
     },
     "status": {
       "type": "string",
-      "enum": ["ok", "warning", "critical"]
+      "enum": ["ok", "warning"]
     }
   }
 }
@@ -101,7 +103,7 @@ The Rule Model defines the configuration schema for the automation logic. The en
         },
         "metric_key": { 
           "type": "string", 
-          "description": "The specific measurement key to check (e.g., 'temperature_c', 'level_pct', 'last_state')" 
+          "description": "The specific measurement key to check (e.g., 'temperature_c')" 
         },
         "operator": { 
           "type": "string", 
